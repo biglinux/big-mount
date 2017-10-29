@@ -1,0 +1,5 @@
+70fb57ac694b506c3758eeb2c2131026  DEBIAN/control
+7a1fa6dbdd383329bcf2859f9e043f81  DEBIAN/postinst
+d41d8cd98f00b204e9800998ecf8427e  DEBIAN/md5sums
+2f02c35f52037a8d40c280823a2929af  usr/bin/bigmount
+5a0a8a1430a0f42719a1ead58478828c  lib/systemd/system/bigmount.service

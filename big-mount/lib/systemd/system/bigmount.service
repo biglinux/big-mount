@@ -1,0 +1,12 @@
+[Unit]
+Description=automount partitions
+
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/bigmount
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
