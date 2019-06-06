@@ -2,7 +2,7 @@ Package: big-mount
 Version: 1.3.5-1big1
 Architecture: all
 Maintainer: Bruno Goncalves <www.biglinux.com.br>
-Installed-Size:48
+Installed-Size:44
 Section: admin
 Depends: util-linux, mount, udisks2
 Priority: optional
