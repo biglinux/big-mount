@@ -1,9 +1,12 @@
 [Unit]
 Description=automount partitions
 
+# Ordering
+After=multi-user.target
+
 
 [Service]
-Type=forking
+Type=oneshot
 ExecStart=/usr/bin/bigmount
 User=root
 Group=root
