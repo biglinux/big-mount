@@ -1,9 +1,0 @@
-Package: big-mount
-Version: 1.3.5-1big2
-Architecture: all
-Maintainer: Bruno Goncalves <www.biglinux.com.br>
-Installed-Size:44
-Section: admin
-Depends: util-linux, mount, udisks2
-Priority: optional
-Description: Tweeks partitions for BigLinux

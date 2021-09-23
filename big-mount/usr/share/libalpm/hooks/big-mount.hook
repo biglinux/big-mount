@@ -1,0 +1,10 @@
+[Trigger]
+Type = Package
+Operation = Install
+Target =  big-mount
+Target =  big-mount-git
+
+[Action]
+Description = Automatic enable big-mount
+When = PostTransaction
+Exec = /usr/bin/systemctl enable big-mount

@@ -1,6 +1,0 @@
-d41d8cd98f00b204e9800998ecf8427e  DEBIAN/md5sums
-7a1fa6dbdd383329bcf2859f9e043f81  DEBIAN/postinst
-5523346385f53281abcdb80a797c8382  DEBIAN/control
-9bf8b69b29b7115a514e421eac0e4273  lib/systemd/system/bigmount.service
-1f1ee8ff10ccef85227c8b5bc809d5f6  usr/bin/bigmount
-a4139b772b74e5721813cc5a6e175017  usr/share/polkit-1/actions/org.freedesktop.UDisks2-allow-mount.policy
