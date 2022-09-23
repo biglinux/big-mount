@@ -1,6 +1,7 @@
 # Maintainer: Bruno Goncalves <bigbruno@gmail.com>
 
 pkgname=big-mount-git
+pkgname2=big-mount
 pkgver=$(date +%y.%m.%d)
 pkgrel=$(date +%H%M)
 arch=('any')
@@ -14,10 +15,10 @@ md5sums=(SKIP)
 
 package() {
     # Verify default folder
-    if [ -d "${srcdir}/${pkgname}/${pkgname}" ]; then
-        InternalDir="${srcdir}/${pkgname}/${pkgname}"
+    if [ -d "${srcdir}/${pkgname2}/${pkgname2}" ]; then
+        InternalDir="${srcdir}/${pkgname2}/${pkgname2}"
     else
-        InternalDir="${srcdir}/${pkgname}"
+        InternalDir="${srcdir}/${pkgname2}"
     fi
 
 
