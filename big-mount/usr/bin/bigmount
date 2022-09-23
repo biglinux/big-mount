@@ -61,6 +61,7 @@ do
 	    if [ "$(echo $i | grep 'TYPE="ntfs"')" != "" ];
 	    then
 		    mkdir "/mnt/$PARTITION" 2> /dev/null
+		    ntfsfix "/dev/$PARTITION"
 		    mount -o noatime,rw,windows_names "/dev/$PARTITION" "/mnt/$PARTITION"
 		    #ntfs-3g -o noatime,windows_names "/dev/$PARTITION" "/mnt/$PARTITION"
         elif [ "$(echo $i | grep "TYPE=\".*fat.*\"")" != "" ]; then
