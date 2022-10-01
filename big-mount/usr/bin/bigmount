@@ -24,7 +24,7 @@ UserID=1000
 GroupID=1000
 else
 UserID=$(id -u $UserLastLogin)
-GroupID=$(id -u $UserLastLogin)
+GroupID=$(id -g $UserLastLogin)
 fi
 #Exibe todas as particoes, menos as de swap
 for i in $(blkid | grep -ve 'TYPE="swap"' -ve 'TYPE="squashfs"')
@@ -72,7 +72,7 @@ do
 	    then
 		    mkdir "/mnt/$PARTITION" 2> /dev/null
 		    ntfsfix "/dev/$PARTITION"
-		    mount -t lowntfs-3g uid=$UserID,gid=$GroupID,rw,user,noatime,exec,umask=000 "/dev/$PARTITION" "/mnt/$PARTITION"
+		    mount -t lowntfs-3g -o uid=$UserID,gid=$GroupID,rw,user,noatime,exec,umask=000 "/dev/$PARTITION" "/mnt/$PARTITION"
 		    #mount -o noatime,rw,windows_names "/dev/$PARTITION" "/mnt/$PARTITION"
 		    #ntfs-3g -o noatime,windows_names "/dev/$PARTITION" "/mnt/$PARTITION"
         elif [ "$(echo $i | grep "TYPE=\".*fat.*\"")" != "" ]; then
