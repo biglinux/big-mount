@@ -85,9 +85,16 @@ do
 	    #Faz links simbolicos entre dispositivo e label, exemplo: /mnt/sda1 /mnt/arquivos
 	    if [ "$(echo $i | grep 'LABEL=')" != "" ];
 	    then
-            if [ ! -e "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" ]
+            # if [ ! -e "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" ]
+	    # O sed acima está isolando tudo entre LABEL=" e " UUID= . O problema aqui é que ele poderá
+	    # capturar também as observações BLOCK SIZE que aparecem nas partições NTFS
+	    if [ ! -e "/mnt/$(echo $i | sed 's/^[^"]*"\([^"]*\)".*/\1/')" ]
+	    # Já esta condição acima apenas isola a palavra que aparece entre o primeiro par de aspas,
+	    # que é justamente a LABEL que queremos, sem pegar o termo BLOCK SIZE junto.
             then
-                ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" 2> /dev/null
+                #ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" 2> /dev/null
+		# Mesma questão que expliquei da linha de comando anterior
+                ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's/^[^"]*"\([^"]*\)".*/\1/')" 2> /dev/null
             fi
 	    fi
     fi
