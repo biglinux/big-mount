@@ -85,9 +85,11 @@ do
 	    #Faz links simbolicos entre dispositivo e label, exemplo: /mnt/sda1 /mnt/arquivos
 	    if [ "$(echo $i | grep 'LABEL=')" != "" ];
 	    then
-            if [ ! -e "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" ]
+            # if [ ! -e "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" ]
+	    if [ ! -e "/mnt/$(echo $i | sed 's/^[^"]*"\([^"]*\)".*/\1/')" ]
             then
-                ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" 2> /dev/null
+                #ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" 2> /dev/null
+                ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's/^[^"]*"\([^"]*\)".*/\1/')" 2> /dev/null
             fi
 	    fi
     fi
