@@ -1,97 +1,25 @@
 #!/bin/bash
 
-
-if [ -e "/etc/bigmountall-no" ]
-then
+# Verifica se existe um arquivo indicando para não montar todas as partições
+if [ -e "/etc/bigmountall-no" ]; then
   exit
 fi
 
-if [ ! -e "/media" ]
-then
-  ln -s /mnt /media
-  ln -s /run/media /mnt/user-mount
-fi
+# Cria o diretório /media se não existir
+mkdir -p /media
 
-#Altera os delimitadores de espaco para quebra de linha
-OIFS=$IFS
-IFS=$'\n'
+# Monta as partições não swap
+for device in $(lsblk -o NAME,TYPE | grep 'disk\|part' | awk '{print $1}'); do
+  # Ignora dispositivos swap
+  if [[ $device == *"swap"* ]]; then
+    continue
+  fi
 
-UserLastLogin="$(grep ^User= /var/lib/sddm/state.conf | cut -f2 -d= | sed 's| $||g')"
+  # Confere se o dispositivo já está montado
+  if grep -qs "/dev/$device" /proc/mounts; then
+    continue
+  fi
 
-if [ "$UserLastLogin" = "" ];
-then
-UserID=1000
-GroupID=1000
-else
-UserID=$(id -u $UserLastLogin)
-GroupID=$(id -g $UserLastLogin)
-fi
-#Exibe todas as particoes, menos as de swap
-for i in $(blkid | grep -ve 'TYPE="swap"' -ve 'TYPE="squashfs"')
-do
-#echo $i | sed 's|:.*||g;s|.*/||g;s|[0-9]||g' Isola o dispositivo, exemplo: sda
-#echo $i | sed 's|:.*||g;s|.*/||g' Isola a particao, exemplo: sda1
-
-    PARTITION="$(echo $i | sed 's|:.*||g;s|.*/||g')"
-
-    #Por padrao considera nao ser removivel
-    bigremovable=n
-
-     #Confere se o dispositivo eh removivel
-     if [ "$(cat /sys/block/$(echo $i | sed 's|:.*||g;s|.*/||g;s|[0-9].*||g')/removable)" = "1" ];
-     then
-        bigremovable=y
-     fi
- 
- 
-     #Confere se o dispositivo eh usb
-     if [ "$(udisksctl info -b $(echo $i | sed 's|:.*||g;s|[0-9].*||g') | grep -e "-usb-")" != "" ];
-     then
-        bigremovable=y
-     fi
- 
-     #Confere se o dispositivo eh oculto
-     if [ "$(udisksctl info -b /dev/$PARTITION | grep -e "HintIgnore:.*true")" != "" ];
-     then
-        bigremovable=y
-     fi
- 
-     #Confere se o dispositivo ja esta montado
-     if [ "$(grep "^/dev/$PARTITION" /proc/mounts)" != "" ];
-     then
-        bigremovable=y
-     fi
-
-
-    #Confere se o dispositivo eh removivel, se nao for prossegue a montagem
-    if [ "$bigremovable" = "n" ];
-    then
-
-	    #Confere se a particao eh ntfs
-	    if [ "$(echo $i | grep 'TYPE="ntfs"')" != "" ];
-	    then
-		    mkdir "/mnt/$PARTITION" 2> /dev/null
-		    ntfsfix "/dev/$PARTITION"
-		    mount -t lowntfs-3g -o uid=$UserID,gid=$GroupID,rw,user,noatime,exec,umask=000 "/dev/$PARTITION" "/mnt/$PARTITION"
-		    #mount -o noatime,rw,windows_names "/dev/$PARTITION" "/mnt/$PARTITION"
-		    #ntfs-3g -o noatime,windows_names "/dev/$PARTITION" "/mnt/$PARTITION"
-        elif [ "$(echo $i | grep "TYPE=\".*fat.*\"")" != "" ]; then
-		    mkdir "/mnt/$PARTITION" 2> /dev/null
-		    mount -o noatime,rw,umask=000 "/dev/$PARTITION" "/mnt/$PARTITION"
-        else
-		    mkdir "/mnt/$PARTITION" 2> /dev/null
-		    mount -o noatime,rw "/dev/$PARTITION" "/mnt/$PARTITION"
-	    fi
-	    #Faz links simbolicos entre dispositivo e label, exemplo: /mnt/sda1 /mnt/arquivos
-	    if [ "$(echo $i | grep 'LABEL=')" != "" ];
-	    then
-            # if [ ! -e "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" ]
-	    if [ ! -e "/mnt/$(echo $i | sed 's/^[^"]*"\([^"]*\)".*/\1/')" ]
-            then
-                #ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's|.*LABEL="||g;s|" UUID=.*||g')" 2> /dev/null
-                ln -s "/mnt/$PARTITION" "/mnt/$(echo $i | sed 's/^[^"]*"\([^"]*\)".*/\1/')" 2> /dev/null
-            fi
-	    fi
-    fi
+  # Monta a partição
+  mount "/dev/$device" "/media/$device"
 done
-IFS=$OIFS
