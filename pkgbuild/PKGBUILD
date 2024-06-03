@@ -1,12 +1,13 @@
 # Maintainer: Bruno Goncalves <bigbruno@gmail.com>
 
-pkgname=big-mount-git
-pkgname2=big-mount
+pkgname=big-mount
 pkgver=$(date +%y.%m.%d)
 pkgrel=$(date +%H%M)
 arch=('any')
 license=('GPL')
 depends=('udisks2' 'util-linux' 'ntfs-3g')
+# provides=('big-mount-git')
+replaces=('big-mount-git')
 url="https://github.com/biglinux/big-mount"
 pkgdesc="Auto mount partitions in internal disks on boot"
 source=("git+https://github.com/biglinux/big-mount.git")
