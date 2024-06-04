@@ -16,10 +16,10 @@ md5sums=(SKIP)
 
 package() {
     # Verify default folder
-    if [ -d "${srcdir}/${pkgname2}/${pkgname2}" ]; then
-        InternalDir="${srcdir}/${pkgname2}/${pkgname2}"
+    if [ -d "${srcdir}/${pkgname}/${pkgname}" ]; then
+        InternalDir="${srcdir}/${pkgname}/${pkgname}"
     else
-        InternalDir="${srcdir}/${pkgname2}"
+        InternalDir="${srcdir}/${pkgname}"
     fi
 
 
