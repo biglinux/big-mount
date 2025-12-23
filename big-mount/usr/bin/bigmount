@@ -30,17 +30,25 @@ for i in $(blkid | grep -ve 'TYPE="swap"' -ve 'TYPE="squashfs"'); do
 
    LABEL_NAME=""
    
-   # 1. Try to get the LABEL
-   if [ "$(echo $i | grep 'LABEL=')" != "" ]; then
-       LABEL_NAME=$(echo $i | sed 's|.*LABEL="||g;s|".*||g')
+   # 1. Try to get the LABEL (not PARTLABEL)
+   # Use sed to extract the value between quotes after LABEL= (but not PARTLABEL=)
+   # The regex looks for a space or start followed by LABEL=" and captures until the closing quote
+   LABEL_NAME=$(echo "$i" | sed -n 's/.* LABEL="\([^"]*\)".*/\1/p')
+   
+   # If line starts with LABEL= (no space before), try that too
+   if [ -z "$LABEL_NAME" ]; then
+       LABEL_NAME=$(echo "$i" | sed -n 's/^[^:]*: LABEL="\([^"]*\)".*/\1/p')
    fi
    
    # 2. If no LABEL found, try to get the PARTLABEL
-   if [ -z "$LABEL_NAME" ] && [ "$(echo $i | grep 'PARTLABEL=')" != "" ]; then
-       LABEL_NAME=$(echo $i | sed 's|.*PARTLABEL="||g;s|".*||g')
+   if [ -z "$LABEL_NAME" ]; then
+       LABEL_NAME=$(echo "$i" | sed -n 's/.*PARTLABEL="\([^"]*\)".*/\1/p')
    fi
+   
+   # 3. Replace spaces with underscores to avoid path issues
+   LABEL_NAME=$(echo "$LABEL_NAME" | tr ' ' '_')
 
-   # 3. Mount Point Definition Logic with Numeric Increment
+   # 4. Mount Point Definition Logic with Numeric Increment
    if [ -n "$LABEL_NAME" ]; then
        BASE_NAME="$LABEL_NAME"
        COUNTER=1
