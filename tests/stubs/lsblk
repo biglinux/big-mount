@@ -1,0 +1,12 @@
+#!/bin/bash
+# Stub: lsblk -no PKNAME /dev/<part> -> parent device from $TESTROOT/fake-lsblk map
+# Map format: each line "<part> <parent>"
+dev=""
+for a in "$@"; do
+    case "$a" in
+        /dev/*) dev="${a#/dev/}" ;;
+    esac
+done
+[ -z "$dev" ] && exit 1
+[ -r "$TESTROOT/fake-lsblk" ] || exit 1
+awk -v p="$dev" '$1==p {print $2; found=1} END {exit !found}' "$TESTROOT/fake-lsblk"

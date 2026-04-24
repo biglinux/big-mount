@@ -1,0 +1,43 @@
+#!/bin/bash
+# Stub mount: logs invocation, appends to fake /proc/mounts, respects $MOUNT_FAIL_DEVS
+# Args last two are source and target (after -o/-t options)
+args=("$@")
+echo "mount ${args[*]}" >> "$TESTROOT/mount.log"
+
+src=""
+tgt=""
+typ="auto"
+# Simple parser: collect non-option positional tail
+skip_next=0
+positional=()
+for ((i=0; i<${#args[@]}; i++)); do
+    if [ "$skip_next" -eq 1 ]; then
+        skip_next=0
+        continue
+    fi
+    case "${args[i]}" in
+        -o|-t) skip_next=1 ;;
+        -*)    ;;
+        *)     positional+=("${args[i]}") ;;
+    esac
+done
+src="${positional[0]}"
+tgt="${positional[1]}"
+
+# Detect -t type
+for ((i=0; i<${#args[@]}; i++)); do
+    [ "${args[i]}" = "-t" ] && typ="${args[i+1]}"
+done
+
+# Optional fail injection
+if [ -n "${MOUNT_FAIL_DEVS:-}" ]; then
+    for bad in $MOUNT_FAIL_DEVS; do
+        if [ "$src" = "$bad" ]; then
+            echo "stub mount: forced fail $src" >&2
+            exit 32
+        fi
+    done
+fi
+
+echo "$src $tgt $typ rw 0 0" >> "$TESTROOT/proc/mounts"
+exit 0

@@ -1,12 +1,12 @@
 [Unit]
-Description=automount partitions
-After=multi-user.target
-
+Description=BigLinux automount internal partitions
+After=local-fs.target
+RequiresMountsFor=/mnt
 
 [Service]
-Type=forking
+Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/bin/bigmount
-
 
 [Install]
 WantedBy=multi-user.target

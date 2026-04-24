@@ -1,0 +1,3 @@
+#!/bin/bash
+# Stub: emit content of $TESTROOT/fake-blkid
+cat "$TESTROOT/fake-blkid"

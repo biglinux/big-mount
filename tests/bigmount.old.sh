@@ -1,0 +1,144 @@
+#!/bin/bash
+
+if [ -e "/etc/bigmountall-no" ]; then
+   exit
+fi
+
+if [ ! -e "/media" ]; then
+   ln -s /mnt /media
+   ln -s /run/media /mnt/user-mount
+fi
+
+# Change space delimiters to newline
+OIFS=$IFS
+IFS=$'\n'
+
+UserLastLogin="$(grep ^User= /var/lib/sddm/state.conf | cut -f2 -d= | sed 's| $||g')"
+
+if [ "$UserLastLogin" = "" ]; then
+   UserID=1000
+   GroupID=1000
+else
+   UserID=$(id -u $UserLastLogin)
+   GroupID=$(id -g $UserLastLogin)
+fi
+
+# Display all partitions except swap
+for i in $(blkid | grep -ve 'TYPE="swap"' -ve 'TYPE="squashfs"'); do
+   
+   PARTITION="$(echo $i | sed 's|:.*||g;s|.*/||g')"
+
+   LABEL_NAME=""
+   
+   # 1. Try to get the LABEL (not PARTLABEL)
+   # Use sed to extract the value between quotes after LABEL= (but not PARTLABEL=)
+   # The regex looks for a space or start followed by LABEL=" and captures until the closing quote
+   LABEL_NAME=$(echo "$i" | sed -n 's/.* LABEL="\([^"]*\)".*/\1/p')
+   
+   # If line starts with LABEL= (no space before), try that too
+   if [ -z "$LABEL_NAME" ]; then
+       LABEL_NAME=$(echo "$i" | sed -n 's/^[^:]*: LABEL="\([^"]*\)".*/\1/p')
+   fi
+   
+   # 2. If no LABEL found, try to get the PARTLABEL
+   if [ -z "$LABEL_NAME" ]; then
+       LABEL_NAME=$(echo "$i" | sed -n 's/.*PARTLABEL="\([^"]*\)".*/\1/p')
+   fi
+   
+   # 3. Replace spaces with underscores to avoid path issues
+   LABEL_NAME=$(echo "$LABEL_NAME" | tr ' ' '_')
+
+   # 4. Mount Point Definition Logic with Numeric Increment
+   if [ -n "$LABEL_NAME" ]; then
+       BASE_NAME="$LABEL_NAME"
+       COUNTER=1
+       LABEL_NAME="$BASE_NAME" # Start with the base name
+       
+       # Loop to find a free or valid name
+       while : ; do
+           
+           # CLEANUP: Check if it is a symbolic link and remove it BEFORE checking existence
+           if [ -L "/mnt/$LABEL_NAME" ]; then
+               rm "/mnt/$LABEL_NAME"
+           fi
+
+           # Check if the folder exists (after potential link removal)
+           if [ ! -e "/mnt/$LABEL_NAME" ]; then
+               # If it doesn't exist, it's free to use. Break loop.
+               break
+           fi
+           
+           # Check if the existing folder is actually a mount point.
+           # We check /proc/mounts to see if "/mnt/$LABEL_NAME" is listed as a destination.
+           IS_MOUNTED=$(grep " /mnt/$LABEL_NAME " /proc/mounts)
+
+           if [ -z "$IS_MOUNTED" ]; then
+               # The folder exists but is NOT mounted (stale folder). Reuse it.
+               break
+           fi
+
+           # If it IS mounted, check if it is mounted by THIS current device (idempotency).
+           if grep -q "/dev/$PARTITION /mnt/$LABEL_NAME" /proc/mounts; then
+               break
+           fi
+
+           # If it is mounted by ANOTHER device, it is a name collision. Increment counter.
+           LABEL_NAME="${BASE_NAME}${COUNTER}"
+           ((COUNTER++))
+       done
+       
+       MOUNT_POINT="/mnt/$LABEL_NAME"
+   else
+       MOUNT_POINT="/mnt/$PARTITION"
+   fi
+   
+   # By default, consider not removable
+   bigremovable=n
+
+   # Check if the device is removable
+   if [ "$(cat /sys/block/$(echo $i | sed 's|:.*||g;s|.*/||g;s|[0-9].*||g')/removable)" = "1" ]; then
+      bigremovable=y
+   fi
+
+   # Check if the device is USB
+   if [ "$(udisksctl info -b $(echo $i | sed 's|:.*||g;s|[0-9].*||g') | grep -e "-usb-")" != "" ]; then
+      bigremovable=y
+   fi
+
+   # Check if the device is hidden
+   if [ "$(udisksctl info -b /dev/$PARTITION | grep -e "HintIgnore:.*true")" != "" ]; then
+      bigremovable=y
+   fi
+
+   # Check if the device is already mounted
+   if [ "$(grep "^/dev/$PARTITION" /proc/mounts)" != "" ]; then
+      bigremovable=y
+   fi
+
+   # Check if the device is removable; if not, proceed to mount
+   if [ "$bigremovable" = "n" ]; then
+      
+      # Check if the partition is NTFS
+      if [ "$(echo $i | grep 'TYPE="ntfs"')" != "" ]; then
+         mkdir "$MOUNT_POINT" 2> /dev/null
+         ntfsfix "/dev/$PARTITION"
+         mount -t lowntfs-3g -o uid=$UserID,gid=$GroupID,rw,user,noatime,exec,umask=000,nodev,nofail,x-gvfs-show "/dev/$PARTITION" "$MOUNT_POINT"
+         
+      elif [ "$(echo $i | grep "TYPE=\".*fat.*\"")" != "" ]; then
+         mkdir "$MOUNT_POINT" 2> /dev/null
+         mount -o noatime,rw,umask=000,nodev,nofail,x-gvfs-show "/dev/$PARTITION" "$MOUNT_POINT"
+      else
+         mkdir "$MOUNT_POINT" 2> /dev/null
+         mount -o noatime,rw,nodev,nofail,x-gvfs-show "/dev/$PARTITION" "$MOUNT_POINT"
+      fi
+
+      # Create Reverse Symbolic Link (Partition Name -> Chosen Label)
+      if [ -n "$LABEL_NAME" ]; then
+         # Only create the link if it doesn't exist
+         if [ ! -e "/mnt/$PARTITION" ]; then
+            ln -s "$MOUNT_POINT" "/mnt/$PARTITION" 2> /dev/null
+         fi
+      fi
+   fi
+done
+IFS=$OIFS

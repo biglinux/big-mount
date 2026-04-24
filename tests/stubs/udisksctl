@@ -1,0 +1,12 @@
+#!/bin/bash
+# Stub: look up response in $TESTROOT/fake-udisksctl/<devname>
+# Called as: udisksctl info -b /dev/<X>
+dev=""
+for a in "$@"; do
+    case "$a" in
+        /dev/*) dev="${a#/dev/}" ;;
+    esac
+done
+f="$TESTROOT/fake-udisksctl/$dev"
+[ -r "$f" ] && cat "$f" || true
+exit 0
