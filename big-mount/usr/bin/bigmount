@@ -41,6 +41,11 @@ for i in $(blkid | grep -v -e 'TYPE="swap"' -e 'TYPE="squashfs"'); do
 
    PARTITION="$(echo "$i" | sed 's|:.*||;s|.*/||')"
 
+   # Skip partitions managed by /etc/fstab, even "noauto"
+   if findmnt --fstab --source "/dev/$PARTITION" >/dev/null 2>&1; then
+      continue
+   fi
+
    # Parent block device works for sdX, nvmeXnYpZ, mmcblkXpY
    PARENT_DEV="$(lsblk -no PKNAME "/dev/$PARTITION" 2>/dev/null | head -n1)"
    if [ -z "$PARENT_DEV" ]; then
