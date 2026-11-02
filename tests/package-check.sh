@@ -63,50 +63,11 @@ check "bigmount --version of the package shows that commit" \
 P="$WORK/pkg"
 expect=(
     "755 usr/bin/bigmount"
-    "755 usr/lib/big-mount/bigmount-holders"
     "644 usr/lib/big-mount/cli.sh"
-    "644 usr/lib/big-mount/lib.sh"
-    "644 usr/lib/big-mount/ui.sh"
-    "644 usr/lib/big-mount/doctor.sh"
-    "755 usr/lib/big-mount/bigmount-drive-helper"
-    "644 usr/lib/big-mount/drive.sh"
-    "644 usr/lib/big-mount/drive-detect.sh"
-    "644 usr/lib/big-mount/drive-diag.sh"
-    "644 usr/lib/big-mount/drive-copy.sh"
-    "644 usr/lib/big-mount/drive-recovery.sh"
-    "644 usr/lib/big-mount/drive-tui.sh"
-    "644 usr/lib/big-mount/drive-erase.sh"
-    "644 usr/lib/big-mount/drive-gui.py"
-    "644 usr/lib/big-mount/dialog.py"
-    "644 usr/lib/big-mount/gui/__init__.py"
-    "644 usr/lib/big-mount/gui/about.py"
-    "644 usr/lib/big-mount/gui/actions.py"
-    "644 usr/lib/big-mount/gui/application.py"
-    "644 usr/lib/big-mount/gui/common.py"
-    "644 usr/lib/big-mount/gui/dialogs.py"
-    "644 usr/lib/big-mount/gui/engine.py"
-    "644 usr/lib/big-mount/gui/models.py"
-    "644 usr/lib/big-mount/gui/monitor.py"
-    "644 usr/lib/big-mount/gui/style.css"
-    "644 usr/lib/big-mount/gui/widgets.py"
-    "644 usr/lib/big-mount/gui/window.py"
-    "644 usr/lib/big-mount/gui/pages/__init__.py"
-    "644 usr/lib/big-mount/gui/pages/device.py"
-    "644 usr/lib/big-mount/gui/pages/job.py"
-    "644 usr/lib/big-mount/gui/pages/maintenance.py"
-    "644 usr/lib/big-mount/gui/pages/overview.py"
-    "644 usr/lib/big-mount/gui/pages/rescue.py"
-    "644 usr/lib/big-mount/gui/pages/results.py"
-    "644 usr/lib/big-mount/gui/welcome.py"
     "644 usr/lib/big-mount/version"
     "644 usr/lib/systemd/system/big-mount.service"
     "644 usr/share/libalpm/hooks/big-mount.hook"
     "644 etc/big-mount.conf"
-    "644 usr/share/big-mount/big-mount-notifier.desktop"
-    "644 usr/share/applications/big-mount.desktop"
-    "644 usr/share/kio/servicemenus/big-mount.desktop"
-    "644 usr/share/polkit-1/actions/org.biglinux.big-mount.policy"
-    "644 usr/share/icons/hicolor/scalable/apps/big-mount.svg"
     "644 usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo"
 )
 for e in "${expect[@]}"; do
@@ -124,26 +85,17 @@ pkginfo="$(source pkgbuild/PKGBUILD 2>/dev/null; printf 'source=%s\n' "${source[
 check "source is the official repository (biglinux/big-mount)" grep -q "^source=git+https://github.com/biglinux/big-mount.git$" <<< "$pkginfo"
 check "url matches the source" grep -q "^url=https://github.com/biglinux/big-mount$" <<< "$pkginfo"
 check "install script exists and is valid" bash -c '[ "$1" = "install=big-mount.install" ] && bash -n pkgbuild/big-mount.install' _ "$(grep ^install= <<< "$pkginfo")"
-check "install script restarts nothing by itself" bash -c '! grep -vE "^\s*(#|echo)" pkgbuild/big-mount.install | grep -qE "systemctl|kill|mount"' 
+check "install script restarts nothing by itself" bash -c '! grep -vE "^\s*(#|echo)" pkgbuild/big-mount.install | grep -qE "(^|[;&|[:space:]])(systemctl|kill|pkill|umount|mount)[[:space:]]"' 
 check "configuration preserved on upgrades (backup=)" grep -q "^backup=etc/big-mount.conf" <<< "$pkginfo"
 check "the obsolete big-mount-git is replaced and cannot be installed beside it" \
     bash -c 'source pkgbuild/PKGBUILD 2>/dev/null; [[ " ${replaces[*]} " == *" big-mount-git "* && " ${conflicts[*]} " == *" big-mount-git "* ]]'
-for d in udisks2 util-linux polkit ntfs-3g lsof rsync smartmontools python python-gobject gtk4 libadwaita libnotify; do check "depends on $d" grep -qw "$d" <<< "$(grep ^depends= <<< "$pkginfo")"; done
+for d in bash util-linux ntfs-3g; do check "depends on $d" grep -qw "$d" <<< "$(grep ^depends= <<< "$pkginfo")"; done
+check "  ... and on nothing of a desktop or of the rescue tools" bash -c '[[ $1 != *gtk* && $1 != *python* && $1 != *adwaita* && $1 != *rsync* && $1 != *smartmontools* && $1 != *lsof* && $1 != *polkit* && $1 != *udisks2* && $1 != *libnotify* ]]' _ "$(grep ^depends= <<< "$pkginfo")"
+check "big-storage-rescue is optional, never required, never in conflict" \
+    bash -c 'source pkgbuild/PKGBUILD 2>/dev/null; [[ " ${optdepends[*]} " == *"big-storage-rescue:"* && " ${depends[*]} ${conflicts[*]} ${replaces[*]} ${provides[*]} " != *big-storage-rescue* ]]'
+check "no file shared with big-storage-rescue" bash -c '! grep -E "storage-rescue|bsr-" <<< "$1"' _ "$installed"
 
 begin "installed files are valid"
-check "syntax: every module of the application" python3 -I -c 'import ast,sys; [ast.parse(open(f, encoding="utf-8").read()) for f in sys.argv[1:]]' "$P/usr/lib/big-mount/drive-gui.py" "$P/usr/lib/big-mount/dialog.py" "$P"/usr/lib/big-mount/gui/*.py "$P"/usr/lib/big-mount/gui/pages/*.py
-check "the package does not need Qt" bash -c 'source pkgbuild/PKGBUILD 2>/dev/null; [[ " ${depends[*]} ${optdepends[*]} " != *pyside* ]]'
-check "dialogs are GTK: no kdialog or zenity, needed or used" bash -c 'source pkgbuild/PKGBUILD 2>/dev/null; [[ " ${depends[*]} ${optdepends[*]} " != *kdialog* && " ${depends[*]} ${optdepends[*]} " != *zenity* ]] && ! grep -rqwE "kdialog|zenity" "$1/usr/lib/big-mount"' _ "$P"
-check "no Markdown file is read at run time" bash -c '! grep -rlE "\.md[\"'"'"' ]" "$1/usr/lib/big-mount/gui" "$1/usr/lib/big-mount/drive-gui.py"' _ "$P"
-if command -v desktop-file-validate >/dev/null; then
-    check "launcher .desktop" desktop-file-validate "$P/usr/share/applications/big-mount.desktop"
-    check "notifier .desktop" desktop-file-validate "$P/usr/share/big-mount/big-mount-notifier.desktop"
-fi
-check "service menu: KIO keys present" bash -c 'grep -q "^Type=Service" "$1" && grep -q "^Actions=" "$1" && grep -q "^MimeType=inode/directory;" "$1"' _ "$P/usr/share/kio/servicemenus/big-mount.desktop"
-command -v xmllint >/dev/null && check "polkit policy is well-formed XML" xmllint --noout "$P/usr/share/polkit-1/actions/org.biglinux.big-mount.policy"
-check "polkit exec.path names the installed helper" grep -q '>/usr/lib/big-mount/bigmount-holders<' "$P/usr/share/polkit-1/actions/org.biglinux.big-mount.policy"
-check "polkit exec.path names the drive helper" grep -q '>/usr/lib/big-mount/bigmount-drive-helper<' "$P/usr/share/polkit-1/actions/org.biglinux.big-mount.policy"
-command -v xmllint >/dev/null && check "icon is a well-formed SVG" xmllint --noout "$P/usr/share/icons/hicolor/scalable/apps/big-mount.svg"
 check "translation catalog loads" msgunfmt -o /dev/null "$P/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo"
 if command -v systemd-analyze >/dev/null; then
     # It also reports on the units it loads with this one, and on the machine it runs
@@ -162,7 +114,7 @@ if command -v systemd-analyze >/dev/null; then
     fi
 fi
 check "service keeps FUSE daemons alive (KillMode=process)" grep -qx 'KillMode=process' "$P/usr/lib/systemd/system/big-mount.service"
-for f in usr/bin/bigmount usr/lib/big-mount/*.sh usr/lib/big-mount/bigmount-holders usr/lib/big-mount/bigmount-drive-helper; do
+for f in usr/bin/bigmount usr/lib/big-mount/*.sh; do
     for g in "$P"/$f; do check "syntax: ${g#"$P"/}" bash -n "$g"; done
 done
 

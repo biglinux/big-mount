@@ -56,36 +56,25 @@ EOF
     [ -n "$bad" ] && printf '      %s\n' "$bad"
 done
 
-begin "generated resources match their templates (run locale/compile.sh)"
+begin "generated catalog matches the translation (run locale/compile.sh)"
 DEST="$WORK/gen" bash locale/compile.sh
-for f in usr/share/applications/big-mount.desktop usr/share/big-mount/big-mount-notifier.desktop \
-         usr/share/kio/servicemenus/big-mount.desktop usr/share/polkit-1/actions/org.biglinux.big-mount.policy; do
-    check "$f" cmp -s "$WORK/gen/$f" "big-mount/$f"
-done
 check "pt_BR .mo" cmp -s <(msgunfmt "$WORK/gen/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo") \
     <(msgunfmt big-mount/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo)
-for key in Name Comment GenericName Keywords; do
-    check "launcher: $key translated" grep -q "^$key\[pt_BR\]=" big-mount/usr/share/applications/big-mount.desktop
-done
-check "service menu: submenu and actions translated" \
-    test "$(grep -c '\[pt_BR\]=' big-mount/usr/share/kio/servicemenus/big-mount.desktop)" -eq 4
-check "polkit: description and message translated (pt_BR form)" \
-    test "$(grep -c 'xml:lang="pt_BR"' big-mount/usr/share/polkit-1/actions/org.biglinux.big-mount.policy)" -eq 4
 
 begin "no user-visible text outside the translation system"
 # Exit 1 only: a match (0) fails, and so does an error of grep (2), which prints nothing
 check "code and templates are English (no accented letters outside .po/.mo)" \
-    bash -c 'LC_ALL=C.UTF-8 grep -rqP --exclude-dir=__pycache__ "[\x{00C0}-\x{024F}]" "$@"; [ "$?" -eq 1 ]' _ big-mount/usr/bin big-mount/usr/lib locale/templates locale/*.sh
+    bash -c 'LC_ALL=C.UTF-8 grep -rqP "[\x{00C0}-\x{024F}]" "$@"; [ "$?" -eq 1 ]' _ big-mount/usr/bin big-mount/usr/lib locale/*.sh
 
 begin "language chosen at run time"
 BM=big-mount/usr/bin/bigmount
 help_line() { env -i PATH="$PATH" "$@" bash "$BM" --help 2>/dev/null | head -n1; }
-check "LANG=C: English" test "$(help_line LANG=C)" = "Usage: bigmount [OPTION] [DEVICE|FOLDER]"
-check "LANG=en_US.UTF-8: English" test "$(help_line LANG=en_US.UTF-8)" = "Usage: bigmount [OPTION] [DEVICE|FOLDER]"
-check "LANG=pt_BR.UTF-8: Portuguese" test "$(help_line LANG=pt_BR.UTF-8)" = "Uso: bigmount [OPÇÃO] [DISPOSITIVO|PASTA]"
-check "language without translation (de_DE): English" test "$(help_line LANG=de_DE.UTF-8)" = "Usage: bigmount [OPTION] [DEVICE|FOLDER]"
+check "LANG=C: English" test "$(help_line LANG=C)" = "Usage: bigmount [OPTION]"
+check "LANG=en_US.UTF-8: English" test "$(help_line LANG=en_US.UTF-8)" = "Usage: bigmount [OPTION]"
+check "LANG=pt_BR.UTF-8: Portuguese" test "$(help_line LANG=pt_BR.UTF-8)" = "Uso: bigmount [OPÇÃO]"
+check "language without translation (de_DE): English" test "$(help_line LANG=de_DE.UTF-8)" = "Usage: bigmount [OPTION]"
 check "LANGUAGE=fr:pt_BR falls back to the next language" \
-    test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=fr:pt_BR)" = "Uso: bigmount [OPÇÃO] [DISPOSITIVO|PASTA]"
+    test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=fr:pt_BR)" = "Uso: bigmount [OPÇÃO]"
 check "errors are translated too" \
     bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --bogus 2>&1 | grep -q "opção desconhecida"' _ "$BM"
 # bash translates $"..." while parsing a command: a text domain chosen inside
@@ -100,6 +89,8 @@ check "--version: translated labels aligned by characters, not bytes" env LC_ALL
         [[ $l =~ ^([^:]*:\ +) ]] && echo "${#BASH_REMATCH[1]}"; done | sort -u | wc -l)"
     [ "$cols" -eq 1 ]' _ "$BM"
 check "--doctor translated" bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 HOME="$HOME" bash "$1" --doctor 2>/dev/null | grep -q "^Resultado: "' _ "$BM"
+check "a command that moved is explained in the language of the user" \
+    bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --drive 2>&1 | grep -q "foi para o Big Storage Rescue"' _ "$BM"
 
 # A translation that lacks one message: that one stays English, the rest is translated
 mkdir -p "$WORK/tree/usr/bin" "$WORK/tree/usr/share/locale/pt_BR/LC_MESSAGES"
@@ -107,7 +98,7 @@ cp "$BM" "$WORK/tree/usr/bin/"; cp -r big-mount/usr/lib "$WORK/tree/usr/"
 msgattrib --no-wrap locale/pt_BR.po | python3 -I -c '
 import sys
 t = sys.stdin.read()
-print(t.replace("msgstr \"Uso: bigmount [OPÇÃO] [DISPOSITIVO|PASTA]\"", "msgstr \"\""))' > "$WORK/partial.po"
+print(t.replace("msgstr \"Uso: bigmount [OPÇÃO]\"", "msgstr \"\""))' > "$WORK/partial.po"
 msgfmt -o "$WORK/tree/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo" "$WORK/partial.po"
 out="$(env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$WORK/tree/usr/bin/bigmount" --help)"
 check "incomplete translation: the missing message falls back to English" grep -q "^Usage: bigmount" <<< "$out"
@@ -130,17 +121,6 @@ else
     printf '  \033[33m-\033[0m terminal (skipped: script(1) unavailable)\n'
 fi
 check "journal (no terminal): English" bash -c '! grep -qE "ignorado|montado|deixado" <<< "$1" && grep -qE "skipped|mounted|left to UDisks" <<< "$1"' _ "$out_log"
-
-begin "formatting with Unicode and long values"
-# shellcheck source=../big-mount/usr/lib/big-mount/cli.sh
-BIGMOUNT_LIB="$REPO/big-mount/usr/lib/big-mount" . "$REPO/big-mount/usr/lib/big-mount/cli.sh"
-BM_UI="tty"; bm_ui_init
-long="Fotos da Família — viagem ao Japão 東京 2026 ✓ $(printf 'x%.0s' {1..120})"
-bm_doc_new; bm_doc_kv "Device" "$long"; bm_doc_render_text
-check "long Unicode label is kept whole in the terminal" grep -qF "$long" <<< "$REPLY"
-check "long Unicode label is kept whole in dialogs" grep -qF "Fotos da Família — viagem ao Japão 東京" <<< "$(bm_doc_nul | tr '\0' '\n')"
-LANGUAGE=pt_BR LC_ALL=pt_BR.UTF-8 printf -v t $"%s is still in use" "$long"
-check "translated format with a Unicode argument" bash -c '[[ $1 == *"Japão"*"em uso" || $1 == *"Japão"*"in use" ]]' _ "$t"
 
 echo ""
 echo "========================================="

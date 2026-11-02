@@ -837,20 +837,48 @@ test_no_destructive_commands() {
     ASSERT_MSG="no repair/format/force/kill -9/recursive chmod in big-mount/"; assert_true test -z "$hits"
 }
 
-# The one operation that erases data (docs/14) is reachable only from the two
-# confirmed flows: the terminal command and the dialog, never from the boot
-# run, the diagnosis or the notifier
-test_secure_erase_only_on_request() {
-    begin "secure-erase-only-on-request"
-    local lib="$REPO/big-mount/usr/lib/big-mount" callers
-    code() { grep -rnE "$1" "$REPO/big-mount" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#'; }
-    ASSERT_MSG="SecurityEraseUnit is called in one place"; assert_true test "$(code 'Drive\.Ata\.SecurityEraseUnit' | wc -l)" -eq 1
-    ASSERT_MSG="Block.Format is called in one place"; assert_true test "$(code 'Block\.Format' | wc -l)" -eq 1
-    ASSERT_MSG="  ... both inside bm_erase_run"; assert_true test "$(awk '/^[a-z_]+\(\) \{/ { f = $1 } /SecurityEraseUnit|Block\.Format/ && !/^[[:space:]]*#/ { print f }' "$lib/lib.sh" | sort -u)" = "bm_erase_run()"
-    callers="$(awk '/^[a-z_]+\(\) \{/ { f = $1 } /bm_erase_run / && !/^[[:space:]]*#/ && !/^bm_erase_run\(\)/ { print f }' "$lib"/*.sh | sort | tr '\n' ' ')"
-    ASSERT_MSG="bm_erase_run only from the confirmed flows (got: $callers)"
-    assert_true test "$callers" = "bm_er_cmd_run() bm_secure_erase_tty() "
-    ASSERT_MSG="the boot script knows nothing about it"; assert_false grep -qE 'erase|Format' "$SCRIPT_SRC"
+# ===== the options besides the boot run (cli.sh) =====
+
+# Big-Mount only mounts: what it did is diagnosed by Big Storage Rescue. Its
+# own options never load a toolkit or another package, and the old ones say
+# where they went.
+test_options_and_moved_commands() {
+    begin "options-and-moved-commands"
+    local b="$REPO/big-mount/usr/bin/bigmount" out rc
+    out="$(LANGUAGE=C bash "$b" --help)"; rc=$?
+    ASSERT_MSG="--help works"; assert_true test "$rc" -eq 0
+    ASSERT_MSG="  ... and names --dry-run, --doctor and --version"; assert_true bash -c '[[ $1 == *--dry-run* && $1 == *--doctor* && $1 == *--version* ]]' _ "$out"
+    ASSERT_MSG="  ... and says where diagnosis and rescue are"; assert_true grep -q 'big-storage-rescue' <<< "$out"
+    ASSERT_MSG="--version names Big-Mount"; assert_true bash -c 'bash "$1" --version | grep -q "^Big-Mount [0-9]"' _ "$b"
+    LANGUAGE=C bash "$b" --doctor --fix >/dev/null 2>&1; rc=$?
+    ASSERT_MSG="--doctor takes no option (it never changes anything)"; assert_true test "$rc" -eq 2
+    out="$(LANGUAGE=C PATH=/usr/bin:/bin bash "$b" --drive copy --source /x 2>&1)"; rc=$?
+    ASSERT_MSG="--drive: exit 2"; assert_true test "$rc" -eq 2
+    ASSERT_MSG="  ... with the command that does it now, arguments kept"; assert_true grep -q 'big-storage-rescue --cli copy --source /x' <<< "$out"
+    for pair in "--gui-drive:big-storage-rescue --gui" "--gui-drive-check:big-storage-rescue --gui-health" "--gui:big-storage-rescue --gui-diagnose" \
+                "--diagnose:big-storage-rescue --diagnose" "--busy:big-storage-rescue --busy" "--unmount:big-storage-rescue --unmount" \
+                "--safe-remove:big-storage-rescue --safe-remove" "--gui-remove:big-storage-rescue --gui-remove"; do
+        out="$(LANGUAGE=C bash "$b" "${pair%%:*}" /dev/sdz1 2>&1)"; rc=$?
+        ASSERT_MSG="${pair%%:*} points to ${pair#*:}"; assert_true bash -c '[ "$1" -eq 2 ] && [[ $2 == *"Use: $3 /dev/sdz1"* ]]' _ "$rc" "$out" "${pair#*:}"
+    done
+    out="$(LANGUAGE=C bash "$b" --secure-erase /dev/sdz 2>&1)"; rc=$?
+    ASSERT_MSG="--secure-erase: refused, and no other tool is suggested"; assert_true bash -c '[ "$1" -eq 2 ] && [[ $2 == *"no longer part"* && $2 != *big-storage-rescue* ]]' _ "$rc" "$out"
+    out="$(bash "$b" --notifier 2>&1)"; rc=$?
+    ASSERT_MSG="--notifier (an old autostart entry): quiet, exit 0"; assert_true test "$rc:$out" = "0:"
+    LANGUAGE=C bash "$b" --bogus >/dev/null 2>&1; rc=$?
+    ASSERT_MSG="an unknown option: exit 2"; assert_true test "$rc" -eq 2
+}
+
+test_nothing_but_the_automount() {
+    begin "nothing-but-the-automount"
+    local lib="$REPO/big-mount/usr/lib/big-mount" files
+    files="$(cd "$REPO/big-mount" && find . -type f | sed 's|^\./||' | sort | tr '\n' ' ')"
+    ASSERT_MSG="only the automount is shipped (got: $files)"
+    assert_true test "$files" = "etc/big-mount.conf usr/bin/bigmount usr/lib/big-mount/cli.sh usr/lib/systemd/system/big-mount.service usr/share/libalpm/hooks/big-mount.hook usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo "
+    code() { grep -rniE "$1" "$REPO/big-mount/usr/bin" "$lib" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#'; }
+    ASSERT_MSG="no Python, GTK or dialog anywhere"; assert_false code 'python|gi\.repository|gtk|libadwaita|kdialog|zenity|notify-send|pkexec'
+    ASSERT_MSG="no copy, image or recovery tool"; assert_false code '\b(rsync|ddrescue|testdisk|photorec|smartctl|lsof)\b' 
+    ASSERT_MSG="the boot run never reads cli.sh before an option"; assert_true bash -c 'awk "/cli.sh/ { print NR; exit }" "$1" | grep -q . && [ "$(grep -n "^DRY_RUN=\"\"" "$1" | cut -d: -f1)" -lt "$(grep -n "cli.sh\" ||" "$1" | cut -d: -f1)" ]' _ "$SCRIPT_SRC"
 }
 
 # ===== run all =====
@@ -918,7 +946,10 @@ test_user_runs_boot_mode
 test_unknown_last_user
 test_lock_file_unwritable
 test_no_destructive_commands
-test_secure_erase_only_on_request
+if [ "$VERSION_LABEL" = new ]; then
+    test_options_and_moved_commands
+    test_nothing_but_the_automount
+fi
 
 echo ""
 echo "========================================="
