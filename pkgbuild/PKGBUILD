@@ -7,7 +7,7 @@ pkgname=big-mount
 pkgver=$(date +%y.%m.%d)
 pkgrel=$(date +%H%M)
 arch=('any')
-license=('GPL')
+license=('GPL-3.0-or-later')
 # Only what the boot run uses: bash, util-linux (blkid, lsblk, findmnt, mount,
 # flock) and ntfs-3g (lowntfs-3g for NTFS). udevadm, getent and awk come with
 # the base system (systemd, glibc, gawk). No graphical toolkit, no Python:
