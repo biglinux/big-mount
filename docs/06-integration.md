@@ -23,4 +23,7 @@ Big-Mount works alone. When `big-storage-rescue` is also installed:
 
 No file is owned by both packages (`tests/package-check.sh` in both
 repositories), and neither declares `conflicts`, `replaces` or `provides` for
-the other.
+the other. Every row of the table above was checked with real pacman
+transactions in scratch roots (`tests/coexistence-check.sh` in Big Storage
+Rescue, 18 checks, 2026-11-02), except the running copy, which is covered by
+the migration tests of Big Storage Rescue.

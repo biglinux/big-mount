@@ -20,10 +20,19 @@ at boot is the same; it was measured for 2.x in
 `docs/history/08-performance.md` and `docs/history/11-final-report.md` (716 ms
 for three internal partitions on a real boot).
 
+## Packages
+
+Both packages were built with `makepkg` from their branches and installed,
+updated and removed in scratch roots with real pacman transactions
+(`tests/coexistence-check.sh` of Big Storage Rescue): 18 checks, no file
+conflict, `/etc/big-mount.conf` kept on the update from 2.6, every file of
+2.6 removed by the update, Big Storage Rescue untouched. `namcap` reports only
+the usual warnings of script packages.
+
 ## Not verified here
 
-- A real boot with this package installed, and `pacman -U` of both packages
-  together: the development machine had a GNU ddrescue recovery running
-  through the installed Big-Mount 2.6, and replacing its files during that job
-  was avoided on purpose. Run `tests/manual-check.sh` after installing.
+- A real boot with this package installed: the development machine had a GNU
+  ddrescue recovery running through the installed Big-Mount 2.6, and
+  replacing its files during that job was avoided on purpose. Run
+  `tests/manual-check.sh` after installing.
 - `tests/bench.sh` on real devices, for the same reason.
