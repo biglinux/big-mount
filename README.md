@@ -1,34 +1,117 @@
+<div align="center">
+
 # Big-Mount
 
-Mounts the partitions of the **internal** disks at boot, under `/mnt/<label>`,
-so that they are there for every program and service from the start. Made for
-[BigLinux](https://www.biglinux.com.br) (Manjaro/Arch). Removable and USB
-devices are left to the desktop (UDisks2, Plasma, Dolphin), and partitions in
-`/etc/fstab` are never touched.
+**Your internal disks, mounted at every boot, the moment the system starts.**
 
-> Big-Mount 2.x also had a drive manager, diagnosis of read-only devices, safe
-> removal and file rescue. Since 3.0 they are a separate application,
-> **[Big Storage Rescue](https://github.com/biglinux/big-storage-rescue)**
-> (`sudo pacman -S big-storage-rescue`). Big-Mount only mounts.
+Mounts the partitions of the **internal** disks under `/mnt/<label>` at boot,
+so they are there for every program and service: Steam libraries, media
+servers, Samba shares, backups. Removable and USB devices stay with the
+desktop, and `/etc/fstab` always wins.
 
-## 1. Installation
+[![License: GPL v3](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
+![BigLinux](https://img.shields.io/badge/BigLinux-Manjaro%20%7C%20Arch-1793d1)
+![Bash](https://img.shields.io/badge/written%20in-bash-4eaa25?logo=gnubash&logoColor=white)
+![systemd](https://img.shields.io/badge/runs%20as-systemd%20service-30d475)
+![Size](https://img.shields.io/badge/installed-40%20KiB-informational)
+
+<img src="docs/images/dry-run.png" alt="sudo bigmount --dry-run on a machine with an NVMe system disk, a Windows NVMe, two SATA data disks, an encrypted disk, a USB hard disk and an SD card" width="860">
+
+[Installation](#-installation) ·
+[How it works](#-how-it-works) ·
+[Checking it](#-checking-it) ·
+[Troubleshooting](#-troubleshooting) ·
+[Configuration](#%EF%B8%8F-configuration) ·
+[Upgrading from 2.x](#-upgrading-from-big-mount-2x) ·
+[Development](#-development)
+
+</div>
+
+---
+
+## ✨ At a glance
+
+| | |
+| --- | --- |
+| **Mounts** | ext4, Btrfs, XFS, F2FS, NTFS, FAT32 and exFAT partitions of internal SATA, NVMe and eMMC disks |
+| **Where** | `/mnt/<label>` (`Family Photos` → `/mnt/Family_Photos`), plus the link `/mnt/sdb1` → `/mnt/Family_Photos` |
+| **When** | once at every boot, by `big-mount.service`, after the local filesystems |
+| **Never touches** | USB, FireWire, Thunderbolt and SD devices · anything in `/etc/fstab` · LUKS, BitLocker, LVM and RAID members · the EFI and Windows recovery partitions · swap |
+| **Windows** | hibernated or Fast Startup volumes are mounted read-only, never "fixed" (no `ntfsfix`, no deleted hiberfile) |
+| **Footprint** | one bash script, 7 files, 40 KiB, no GUI toolkit, no Python, nothing left running |
+| **Languages** | English and Brazilian Portuguese |
+
+> [!NOTE]
+> Big-Mount **only mounts**. The drive manager, the diagnosis of read-only
+> devices, safe removal and file rescue of Big-Mount 2.x are now a separate
+> application, **[Big Storage Rescue](https://github.com/biglinux/big-storage-rescue)**
+> (`sudo pacman -S big-storage-rescue`). See [Upgrading from 2.x](#-upgrading-from-big-mount-2x).
+
+## 📦 Installation
 
 ```bash
 sudo pacman -S big-mount
 ```
 
-The pacman hook enables `big-mount.service`; it runs at the next boot. To mount
-now: `sudo systemctl start big-mount`. Dependencies: bash, util-linux, ntfs-3g.
+The pacman hook enables `big-mount.service`, which mounts the partitions at the
+next boot. To mount them right away:
 
 ```bash
-bigmount --dry-run    # what would be mounted, changing nothing
-bigmount --doctor     # is the service doing its job? what happened at boot?
-bigmount --version
+sudo systemctl start big-mount
 ```
 
-## 2. Automatic mounting at boot
+### Dependencies
 
-### 2.1 Sequence
+| Package | Used for |
+| --- | --- |
+| `bash` | the script itself |
+| `util-linux` | `blkid`, `lsblk`, `findmnt`, `mount`, `flock` |
+| `ntfs-3g` | `mount.lowntfs-3g`, for NTFS |
+| `systemd` | the service, `udevadm`, and `systemctl`/`journalctl` in `--doctor` |
+| `coreutils`, `glibc`, `gawk`, `sed` | `mkdir`, `ln`, `readlink`, `stat`…, `getent`, `awk`, `sed` |
+| *optional:* `big-storage-rescue` | explains read-only or failed mounts, safe removal, drive health, file rescue |
+
+FAT32, exFAT, ext4, Btrfs, XFS and F2FS are mounted by kernel drivers. Every
+package above except `ntfs-3g` is already part of an Arch base system. Details:
+[docs/04-dependencies.md](docs/04-dependencies.md).
+
+### Commands
+
+<img src="docs/images/help.png" alt="bigmount --help" width="720">
+
+| Command | What it does | Root? |
+| --- | --- | --- |
+| `bigmount` | mounts the internal partitions (this is what the service runs) | yes |
+| `bigmount --dry-run` | shows every decision and every command, **changes nothing** | recommended¹ |
+| `bigmount --doctor` | checks the service and reports what it did at this boot, changes nothing | no |
+| `bigmount --version` | version and the exact source revision of the package | no |
+
+¹ As a normal user `blkid` may not see every partition; with `sudo` the answer is complete.
+
+## 🔍 How it works
+
+```mermaid
+flowchart TD
+    A["blkid: every partition"] --> B{"a filesystem?"}
+    B -- "swap, squashfs, LUKS, BitLocker,<br/>LVM / RAID / ZFS member" --> SKIP["skipped"]
+    B -- yes --> C{"virtual device or<br/>already mounted?"}
+    C -- yes --> SKIP
+    C -- no --> D{"processed by udev?<br/>(waits once, up to 10 s)"}
+    D -- no --> SKIP
+    D -- yes --> E{"UDISKS_IGNORE?<br/>(EFI, MSR, Windows RE)"}
+    E -- yes --> SKIP
+    E -- no --> F{"external?<br/>removable · USB · hotplug · SD"}
+    F -- yes --> UD["left to UDisks<br/>(Plasma, Dolphin)"]
+    F -- no --> G{"in /etc/fstab?"}
+    G -- yes --> FS["left to fstab"]
+    G -- no --> H["choose /mnt/LABEL"]
+    H --> I{"disk replaced<br/>during the scan?"}
+    I -- yes --> SKIP
+    I -- no --> M["mount, read the real state back"]
+    M --> S["/run/big-mount/status"]
+```
+
+### Sequence of a boot run
 
 ```text
 big-mount.service (Type=oneshot, After=local-fs.target, KillMode=process)
@@ -48,7 +131,11 @@ big-mount.service (Type=oneshot, After=local-fs.target, KillMode=process)
    9. writes /run/big-mount/status
 ```
 
-### 2.2 What is never mounted
+The script ends within milliseconds (716 ms for three partitions on a real
+boot, most of it in `mount`) and nothing of it stays resident. The only
+processes left are the `mount.lowntfs-3g` daemons that serve NTFS volumes.
+
+### What is never mounted
 
 | Case | Why |
 | --- | --- |
@@ -62,7 +149,7 @@ big-mount.service (Type=oneshot, After=local-fs.target, KillMode=process)
 | udev still has no information after the wait | without facts, there is no telling whether it is external |
 | `diskseq` changed during the scan | the disk was replaced; the decision no longer holds |
 
-### 2.3 How an external device is recognized
+### How an external device is recognized
 
 Many USB hard disks and SSDs report `RM=0` ("not removable"), so the decision
 combines **independent sources**. Any one of them is enough to leave the
@@ -76,30 +163,12 @@ device to UDisks:
 | kernel (sysfs) | `device/type = SD` | SD card in an internal reader (`MMC` is soldered eMMC: internal) |
 | udev | `ID_BUS=usb`/`ieee1394`, `ID_PATH` containing `-usb-` | the same information, seen by udev |
 | udev | `ID_DRIVE_FLASH_SD=1`, `ID_DRIVE_MEDIA_FLASH_SD=1` | SD cards |
-| udev | `UDISKS_SYSTEM=0` | an administrator's rule, e.g. for eSATA bays ([4.3](#43-esata-bays-and-other-special-cases)) |
+| udev | `UDISKS_SYSTEM=0` | an administrator's rule, e.g. for eSATA bays ([see below](#esata-bays-and-other-special-cases)) |
 
-To see the decision for every device (excerpt from the development machine):
+The reasons are printed by `--dry-run` and in the journal, for example
+`left to UDisks, external device (transport=usb hotplug ID_BUS=usb ID_PATH=usb)`.
 
-```console
-$ sudo bigmount --dry-run
-/dev/nvme0n1p1: skipped, hidden by udev/UDisks (UDISKS_IGNORE)
-/dev/nvme0n1p2: skipped, listed in /etc/fstab
-/dev/sdd1: left to UDisks, external device (transport=usb hotplug ID_BUS=usb ID_PATH=usb)
-dry-run: mkdir -p /mnt/Basic_data_partition
-dry-run: mount -t lowntfs-3g -o uid=1000,gid=1007,rw,noatime,exec,umask=000,nodev,nofail,x-gvfs-show /dev/sdb3 /mnt/Basic_data_partition
-/dev/sdb3: would be mounted ntfs on /mnt/Basic_data_partition (rw)
-/dev/sdb1: skipped, hidden by udev/UDisks (UDISKS_IGNORE)
-dry-run: mkdir -p /mnt/Dados
-dry-run: mount -o noatime,rw,nodev,nofail,x-gvfs-show /dev/sda1 /mnt/Dados
-/dev/sda1: would be mounted btrfs on /mnt/Dados (rw)
-```
-
-`--dry-run` creates no directory, mounts nothing and writes no status file.
-It works as a normal user, but as root `blkid` sees every partition. On a
-terminal the messages follow your language; in the journal they stay in
-English.
-
-### 2.4 Mount point name
+### Mount point name
 
 1. The filesystem `LABEL`; without one, the `PARTLABEL` (GPT partition
    name); without both, the device name (`sdb3`).
@@ -117,7 +186,7 @@ English.
 The label comes from the device and is untrusted: it never goes through
 `eval`, `echo` or a shell.
 
-### 2.5 Mount options
+### Mount options
 
 | Filesystem | Command |
 | --- | --- |
@@ -126,11 +195,11 @@ The label comes from the device and is untrusted: it never goes through
 | ext4, Btrfs, XFS, F2FS and others | `mount -o noatime,rw,nodev,nofail,x-gvfs-show` |
 
 - `U`/`G`: UID and GID of the last user who logged in.
-- `MASK`: `umask=000` by default; see [`PERMISSIONS`](#41-etcbig-mountconf).
+- `MASK`: `umask=000` by default; see [`PERMISSIONS`](#etcbig-mountconf).
 - `x-gvfs-show`: shows the partition in Dolphin and Nautilus.
 - ext4/Btrfs/XFS keep the filesystem's own permissions.
 
-### 2.6 Windows NTFS partitions
+### Windows NTFS partitions
 
 - **No `ntfsfix`.** Older versions ran `ntfsfix` on every boot. It marks the
   volume as "needs to be checked" (the dirty bit): Windows then runs chkdsk
@@ -138,51 +207,14 @@ The label comes from the device and is untrusted: it never goes through
   recovers the journal by itself when needed.
 - **Windows hibernated or with Fast Startup:** ntfs-3g mounts the volume
   read-only on its own. Big-Mount reads the real state back from
-  `/proc/mounts`, records the reason; `big-storage-rescue --diagnose` explains it. ntfs-3g
-  versions that refuse (exit codes 13, 14 and 15 of `ntfs-3g.probe(8)`) are
-  retried with `ro`. `remove_hiberfile`, which would delete the Windows
-  session, is never used.
+  `/proc/mounts` and records the reason, which `big-storage-rescue --diagnose`
+  explains. ntfs-3g versions that refuse instead (exit codes 13, 14 and 15 of
+  `ntfs-3g.probe(8)`) are retried with `ro`. `remove_hiberfile`, which would
+  delete the Windows session, is never used.
 - To write again, shut Windows down completely (Shift + Shut down) or
   disable Fast Startup.
 
-### 2.7 Status file
-
-`/run/big-mount/status` (root, 0644, cleared at every boot) has one line per
-mount made at boot. It is read by `bigmount --doctor` and by Big Storage
-Rescue, with fields separated by tabs:
-
-```text
-# big-mount status v1: DEVICE UUID MOUNTPOINT STATE REASON
-/dev/sda1	12a560b3-...	/mnt/Data	rw	-
-/dev/sdb3	BE0256040255C1D7	/mnt/Basic_data_partition	ro	ntfs-readonly
-/dev/sdc5	-	/mnt/Old	failed	mount-exit-32
-```
-
-| `STATE` | Possible `REASON` |
-| --- | --- |
-| `rw` | `-` |
-| `ro` | `ntfs-readonly`, `ntfs-hibernated`, `ntfs-inconsistent`, `ntfs-unclean`, `readonly-fallback` |
-| `failed` | the NTFS reasons, or `mount-exit-N` |
-
-### 2.8 Logs
-
-```bash
-journalctl -b -u big-mount            # what happened during this boot
-journalctl -b -u big-mount -p warning # warnings and errors only
-systemd-analyze blame | grep big-mount
-```
-
-Example messages:
-
-```text
-/dev/sda1: mounted btrfs on /mnt/Data (rw)
-/dev/sdd1: left to UDisks, external device (transport=usb hotplug ID_BUS=usb ID_PATH=usb)
-/dev/sdb3: the driver mounted ntfs read-only on its own (ntfs-readonly)        [warning]
-/dev/sdc5: mount of ext4 on /mnt/Old failed (exit 32)                          [error]
-waiting for udev to finish processing /dev/sde1
-```
-
-### 2.9 The systemd service
+### The systemd service
 
 ```ini
 [Unit]
@@ -200,18 +232,63 @@ KillMode=process
 `KillMode=process` matters: the NTFS FUSE daemon (`mount.lowntfs-3g`) is
 started inside the service. With the default `control-group`, a `systemctl
 restart big-mount` killed it and the volume vanished under the programs
-using it. Nothing stays resident: the script ends within milliseconds.
+using it.
 
-## 3. Why is a partition read-only, or not mounted?
+## 🩺 Checking it
 
-`bigmount --doctor` lists what failed or was mounted read-only at this boot,
-with the reason (`ntfs-hibernated`, `mount-exit-32`…). For the full
-explanation, the health of the drive, and the way to fix it or rescue its
-files, use Big Storage Rescue: `big-storage-rescue --diagnose /dev/sdXN`.
+### `bigmount --doctor`
 
-## 4. Configuration
+Is the service enabled, did it run at this boot, did anything fail or end up
+read-only, is the installation intact? It changes nothing, needs no root, and
+leaves labels and mount points out of the report, so it can be pasted in a
+forum or a bug report as it is.
 
-### 4.1 `/etc/big-mount.conf`
+<img src="docs/images/doctor.png" alt="bigmount --doctor reporting no problems" width="820">
+
+It exits with `0` when no problem was found and `1` otherwise.
+
+### The journal and the status file
+
+<img src="docs/images/boot-log.png" alt="journalctl -b -u big-mount and /run/big-mount/status after a boot where Windows was hibernated" width="760">
+
+```bash
+journalctl -b -u big-mount             # what happened during this boot
+journalctl -b -u big-mount -p warning  # warnings and errors only
+systemd-analyze blame | grep big-mount # how long it took
+```
+
+On a terminal the messages follow your language; in the journal they stay in
+English, so they can be searched for and quoted in bug reports.
+
+`/run/big-mount/status` (root, 0644, cleared at every boot) has one line per
+mount made at boot, separated by tabs. It is read by `bigmount --doctor` and by
+Big Storage Rescue.
+
+| `STATE` | Possible `REASON` |
+| --- | --- |
+| `rw` | `-` |
+| `ro` | `ntfs-readonly`, `ntfs-hibernated`, `ntfs-inconsistent`, `ntfs-unclean`, `readonly-fallback` |
+| `failed` | the NTFS reasons, or `mount-exit-N` |
+
+## 🛠 Troubleshooting
+
+| Symptom | What to do |
+| --- | --- |
+| A partition is not mounted | `sudo bigmount --dry-run` prints why for every partition. `skipped, listed in /etc/fstab` means fstab owns it; `left to UDisks` means it looks external |
+| An internal disk is treated as external | usually an eSATA bay or a dock: see [eSATA bays](#esata-bays-and-other-special-cases). The reason in parentheses says which fact decided it |
+| A Windows partition is read-only | Windows is hibernated or uses Fast Startup: shut it down with Shift + Shut down, or disable Fast Startup. `big-storage-rescue --diagnose /dev/sdXN` gives the full explanation |
+| `mount … failed (exit 32)` | the filesystem needs a check (`fsck`, or `chkdsk` on Windows), or its driver is missing. `journalctl -b -u big-mount` has the message of `mount` |
+| Other users cannot write to a FAT/NTFS partition, or can and should not | set [`PERMISSIONS`](#etcbig-mountconf) |
+| I want another mount point or other options | put the partition in `/etc/fstab`; Big-Mount steps aside |
+| I do not want Big-Mount at all | `sudo touch /etc/bigmountall-no`, see [below](#disable-the-automatic-mounting) |
+| `bigmount: mounting the internal partitions needs administrator rights` | mounting is the job of the service: `sudo systemctl restart big-mount` |
+
+When asking for help, attach the output of `bigmount --doctor` and
+`sudo bigmount --dry-run`.
+
+## ⚙️ Configuration
+
+### `/etc/big-mount.conf`
 
 ```ini
 # Who may write to INTERNAL FAT, exFAT and NTFS partitions mounted under /mnt
@@ -232,14 +309,14 @@ PERMISSIONS=shared
 - Apply without rebooting: `sudo systemctl restart big-mount`. Partitions
   that are already mounted keep their options until they are mounted again.
 
-### 4.2 Disable the automatic mounting
+### Disable the automatic mounting
 
 ```bash
 sudo touch /etc/bigmountall-no      # disable
 sudo rm /etc/bigmountall-no         # enable again
 ```
 
-### 4.3 eSATA bays and other special cases
+### eSATA bays and other special cases
 
 The kernel does not mark eSATA ports as removable. For Big-Mount (and
 UDisks) to treat an eSATA disk as external, add a udev rule:
@@ -261,9 +338,21 @@ To **prevent** an internal partition from being mounted, either put it in
 To mount a partition somewhere else or with other options, put it in
 `/etc/fstab`. Big-Mount never touches partitions listed there.
 
-## 5. Commands of Big-Mount 2.x
+## 🔄 Upgrading from Big-Mount 2.x
 
-They print the command that does the same now and exit with code 2:
+Big-Mount 3.0 keeps the boot run of 2.x unchanged (only comments differ) and
+removes everything else. The update keeps `/etc/big-mount.conf` and the
+enabled service; the next boot behaves exactly as before.
+
+```bash
+sudo pacman -Syu                     # big-mount 3.0
+sudo pacman -S big-storage-rescue    # the drive manager, diagnosis, safe removal and rescue
+```
+
+The options of 2.x still answer, with the command that does the same now
+(exit code 2), so scripts and habits fail loudly instead of silently:
+
+<img src="docs/images/moved.png" alt="Options of Big-Mount 2.x pointing to Big Storage Rescue" width="760">
 
 | 2.x | Now |
 | --- | --- |
@@ -272,20 +361,76 @@ They print the command that does the same now and exit with code 2:
 | `bigmount --gui DEV` | `big-storage-rescue --gui-diagnose DEV` |
 | `bigmount --diagnose`, `--busy`, `--unmount`, `--safe-remove`, `--gui-remove` | `big-storage-rescue` with the same option |
 | `bigmount --secure-erase` | not available any more |
+| `bigmount --notifier` (old autostart entries) | does nothing, quietly |
 
-## 6. Development
+> [!IMPORTANT]
+> **Let copies and disk images of the 2.x drive manager finish before you
+> update.** A job that is already running goes on after the update, but the
+> files that manage it are removed with 2.x; Big Storage Rescue picks it up
+> when it ends. The package warns about running jobs during the update.
+
+## 🗑 Uninstalling
 
 ```bash
-bash tests/run-tests.sh new     # the boot run with stubbed devices
-bash tests/i18n-tests.sh        # translations
-bash tests/package-check.sh     # package() on this checkout
+sudo systemctl disable big-mount
+sudo pacman -R big-mount
+```
+
+Partitions mounted at this boot stay mounted until the next shutdown. The
+compatibility links `/media` and `/mnt/user-mount` and the folders under `/mnt`
+are left in place: remove them by hand if nothing else uses them.
+
+## 🌐 Translations
+
+Every message shown on a terminal is translated; the journal stays in English.
+Brazilian Portuguese is included:
+
+<img src="docs/images/help-pt.png" alt="bigmount --help in Brazilian Portuguese" width="720">
+
+To add a language: `locale/update-pot.sh`, copy `locale/big-mount.pot` to
+`locale/<lang>.po`, translate it, add the code to `locale/LINGUAS` and run
+`locale/compile.sh`.
+
+## 🧪 Development
+
+```bash
+bash tests/run-tests.sh new     # the boot run against stubbed devices (132 checks)
+bash tests/i18n-tests.sh        # translations (26 checks)
+bash tests/package-check.sh     # package() on this checkout (36 checks)
 bash tests/bench.sh big-mount/usr/bin/bigmount   # the boot run on the real devices, mount stubbed
 tests/manual-check.sh           # after a real boot with the package installed
 ```
 
-Technical notes: [docs/](docs) (01–07); the history of 2.x, including the
+None of the suites touches a disk: every tool that could is replaced by a stub
+in `tests/stubs/`, and the harness refuses to run if one of them resolves to
+the real program. CI runs ShellCheck and the three suites on Arch Linux for
+every pull request.
+
+To try a change on your machine without installing it:
+
+```bash
+sudo big-mount/usr/bin/bigmount --dry-run
+```
+
+### Project layout
+
+```text
+big-mount/                       what the package installs
+├── etc/big-mount.conf           configuration
+└── usr/
+    ├── bin/bigmount             the boot run (the only code loaded at boot)
+    ├── lib/big-mount/cli.sh     --help, --version, --doctor, the 2.x options
+    ├── lib/systemd/system/      big-mount.service
+    └── share/libalpm/hooks/     enables the service on install
+pkgbuild/                        PKGBUILD and install messages
+locale/                          translations
+tests/                           test suites and device stubs
+docs/                            design notes (01–07) and the history of 2.x
+```
+
+Technical notes: [docs/](docs) (01–07). The history of 2.x, including the
 reasons behind the device detection, is in [docs/history](docs/history).
 
-## 7. License
+## 📄 License
 
-[GNU General Public License v3.0](LICENSE).
+[GNU General Public License v3.0 or later](LICENSE).
