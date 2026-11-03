@@ -1,7 +1,7 @@
 # 03 — Architecture
 
 ```
-/usr/bin/bigmount                     boot run (no option) and --dry-run; everything in bash builtins
+/usr/bin/bigmount                     boot run (no option) and --dry-run; parsing in bash, the tools of 04-dependencies.md for the rest
 /usr/lib/big-mount/cli.sh             --help, --version, --doctor, old options (loaded only for them)
 /usr/lib/big-mount/version            commit and date of the build (written by the PKGBUILD)
 /usr/lib/systemd/system/big-mount.service
@@ -16,7 +16,8 @@ The boot run, in one pass:
 1. one snapshot of `blkid`, `lsblk` (topology, `TRAN`, `RM`, `HOTPLUG`),
    `/proc/mounts` and the disk sequence numbers;
 2. cheap filters (swap, containers, virtual devices, already mounted), then
-   one `udevadm info` call for all candidates (waits once for udev when needed);
+   one `udevadm info` call for all candidates; if udev has not finished with
+   some, one `udevadm settle` (10 s at most) and a second call for those;
 3. for each partition: external? in `/etc/fstab`? a safe mount point name;
    the disk sequence number again; `mount` with the options of its filesystem;
 4. the real state (a driver may fall back to read-only by itself) goes to the

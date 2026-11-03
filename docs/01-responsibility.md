@@ -1,8 +1,9 @@
 # 01 — What Big-Mount does
 
 Big-Mount mounts the partitions of the **internal** disks at boot, under
-`/mnt/<label>`, so that they are there for every program and service from the
-start. That is all.
+`/mnt/<label>` (the filesystem label, else the GPT partition name, else the
+device name, as in `/mnt/sdb3`), so that they are there for every program and
+service from the start. That is all.
 
 - `big-mount.service` (oneshot, after `local-fs.target`) runs `/usr/bin/bigmount`
   as root once per boot and ends. NTFS volumes keep their FUSE daemon

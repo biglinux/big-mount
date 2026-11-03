@@ -48,6 +48,7 @@ new package. Exit code 2.
 | `--secure-erase` | `bigmount: Secure Erase is no longer part of Big-Mount.` |
 | `--notifier` | nothing, exit 0 (an autostart entry of 2.x may still start it at login) |
 
-When `big-storage-rescue` is not installed, the answer adds how to install it.
+When `big-storage-rescue` is not installed, the answer of an option that moved
+adds how to install it (`--secure-erase` has no new home, so it does not).
 The pacman script says the same once, before the update replaces the files,
 and warns when a copy or image of the 2.x drive manager is still running.

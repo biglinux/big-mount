@@ -30,4 +30,7 @@ the boot run, and are dropped. On a desktop they are pulled in by Plasma or
 GNOME anyway.
 
 `big-storage-rescue` is optional, never required and never in conflict:
-`tests/package-check.sh` checks it, and that no installed path belongs to it.
+`tests/package-check.sh` checks it, and that no installed path is named after it
+(`storage-rescue`, `bsr-`). That the two packages share no file is checked by
+`tests/coexistence-check.sh` of Big Storage Rescue, which installs both with
+pacman: pacman refuses a file that two packages own.

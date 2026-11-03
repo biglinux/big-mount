@@ -3,7 +3,7 @@
 | | Big-Mount 2.6 | Big-Mount 3.0 |
 | --- | --- | --- |
 | Responsibility | automount + drive manager, diagnosis, removal, rescue, Secure Erase, notifier, GTK application | automount |
-| Installed files | 45 | 37: 6, the version file and 31 translations |
+| Installed files | 45 | 37: 5 files, the version file and 31 translations |
 | Installed size | 803 KB | 291 KB, 258 KB of it translations (41 KB with pt_BR only) |
 | Dependencies | 13 | 8, five of them from the base system (3 before they were all listed) |
 | Boot path (`/usr/bin/bigmount` without options) | — | identical code (only comments changed) |
@@ -25,8 +25,9 @@ for three internal partitions on a real boot).
 Both packages were built with `makepkg` from their branches and installed,
 updated and removed in scratch roots with real pacman transactions
 (`tests/coexistence-check.sh` of Big Storage Rescue): 18 checks, no file
-conflict, `/etc/big-mount.conf` kept on the update from 2.6, every file of
-2.6 removed by the update, Big Storage Rescue untouched. `namcap` reports only
+conflict, `/etc/big-mount.conf` kept on the update from 2.6, the files of 2.x
+checked gone after the update (`drive-gui.py`, `gui/`, the desktop entry), Big
+Storage Rescue untouched. `namcap` reports only
 the usual warnings of script packages.
 
 ## Not verified here
