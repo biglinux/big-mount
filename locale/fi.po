@@ -1,0 +1,278 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: big-mount\n"
+"PO-Revision-Date: 2026-11-01 12:00-0300\n"
+"Last-Translator: BigLinux\n"
+"Language-Team: Finnish\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: big-mount/usr/bin/bigmount:84
+msgid "bigmount: mounting the internal partitions needs administrator rights. big-mount.service does it at every boot."
+msgstr "bigmount: sisäisten osioiden liittäminen vaatii pääkäyttäjän oikeudet. big-mount.service tekee sen jokaisella käynnistyskerralla."
+
+#: big-mount/usr/bin/bigmount:85
+msgid "To mount them now:            sudo systemctl restart big-mount"
+msgstr "Liitä ne nyt:              sudo systemctl restart big-mount"
+
+#: big-mount/usr/bin/bigmount:86
+msgid "To see what would be mounted: bigmount --dry-run"
+msgstr "Näytä, mitä liitettäisiin: bigmount --dry-run"
+
+#: big-mount/usr/bin/bigmount:87
+msgid "To check the installation:    bigmount --doctor"
+msgstr "Tarkista asennus:          bigmount --doctor"
+
+#: big-mount/usr/bin/bigmount:97
+msgid "cannot open the lock file /run/lock/big-mount.lock, giving up"
+msgstr "lukkotiedostoa /run/lock/big-mount.lock ei voi avata, lopetetaan"
+
+#: big-mount/usr/bin/bigmount:102
+msgid "another bigmount is still running, giving up"
+msgstr "toinen bigmount on yhä käynnissä, lopetetaan"
+
+#: big-mount/usr/bin/bigmount:144
+msgid "last login '%s' is not a known account, ignoring it"
+msgstr "viimeksi kirjautunut käyttäjä '%s' ei ole tunnettu tili, ohitetaan"
+
+#: big-mount/usr/bin/bigmount:165
+msgid "/etc/big-mount.conf: unknown value '%s', using shared"
+msgstr "/etc/big-mount.conf: tuntematon arvo '%s', käytetään arvoa shared"
+
+#: big-mount/usr/bin/bigmount:284
+msgid "%s: skipped, %s is not a filesystem"
+msgstr "%s: ohitettu, %s ei ole tiedostojärjestelmä"
+
+#: big-mount/usr/bin/bigmount:290
+msgid "%s: skipped, virtual device"
+msgstr "%s: ohitettu, virtuaalinen laite"
+
+#: big-mount/usr/bin/bigmount:297
+msgid "%s: skipped, already mounted"
+msgstr "%s: ohitettu, jo liitetty"
+
+#: big-mount/usr/bin/bigmount:333
+msgid "waiting for udev to finish processing %s"
+msgstr "odotetaan, että udev saa laitteen %s käsiteltyä"
+
+#: big-mount/usr/bin/bigmount:383
+msgid "%s: udev has no information about it yet, not mounting"
+msgstr "%s: udevilla ei ole siitä vielä tietoja, ei liitetä"
+
+#: big-mount/usr/bin/bigmount:387
+msgid "%s: skipped, hidden by udev/UDisks (UDISKS_IGNORE)"
+msgstr "%s: ohitettu, udev/UDisks piilottaa sen (UDISKS_IGNORE)"
+
+#: big-mount/usr/bin/bigmount:395
+msgid "%s: left to UDisks, external device (%s)"
+msgstr "%s: jätetty UDisksille, ulkoinen laite (%s)"
+
+#: big-mount/usr/bin/bigmount:401
+msgid "%s: skipped, listed in /etc/fstab"
+msgstr "%s: ohitettu, mainittu tiedostossa /etc/fstab"
+
+#: big-mount/usr/bin/bigmount:453
+msgid "%s: device changed during the scan, not mounting"
+msgstr "%s: laite muuttui läpikäynnin aikana, ei liitetä"
+
+#: big-mount/usr/bin/bigmount:479
+msgid "%s: NTFS refused read-write mount (%s), retrying read-only"
+msgstr "%s: NTFS ei sallinut liittämistä luku- ja kirjoitustilassa (%s), yritetään uudelleen vain luku -tilassa"
+
+#: big-mount/usr/bin/bigmount:496
+msgid "%s: mount of %s on %s failed (exit %s)"
+msgstr "%s (%s): liittäminen kohtaan %s epäonnistui (paluuarvo %s)"
+
+#: big-mount/usr/bin/bigmount:517
+msgid "%s: the driver mounted %s read-only on its own (%s)"
+msgstr "%s (%s): ajuri liitti sen omin päin vain luku -tilassa (%s)"
+
+#: big-mount/usr/bin/bigmount:524
+msgid "%s: would be mounted %s on %s (%s)"
+msgstr "%s (%s): liitettäisiin kohtaan %s (%s)"
+
+#: big-mount/usr/bin/bigmount:526
+msgid "%s: mounted %s on %s (%s)"
+msgstr "%s (%s): liitetty kohtaan %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:28
+msgid "Usage: bigmount [OPTION]"
+msgstr "Käyttö: bigmount [VALITSIN]"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "(none)"
+msgstr "(ei mitään)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "mount internal partitions (run at boot by big-mount.service)"
+msgstr "liitä sisäiset osiot (big-mount.service tekee tämän käynnistyksessä)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:33
+msgid "show what would be mounted, change nothing"
+msgstr "näytä, mitä liitettäisiin, muuttamatta mitään"
+
+#: big-mount/usr/lib/big-mount/cli.sh:34
+msgid "check the boot service and what it did in this boot"
+msgstr "tarkista käynnistyspalvelu ja mitä se teki tällä käynnistyskerralla"
+
+#: big-mount/usr/lib/big-mount/cli.sh:35
+msgid "show the version and the source revision"
+msgstr "näytä versio ja lähdekoodin revisio"
+
+#: big-mount/usr/lib/big-mount/cli.sh:36
+msgid "show this help"
+msgstr "näytä tämä ohje"
+
+#: big-mount/usr/lib/big-mount/cli.sh:37
+msgid "Configuration: /etc/big-mount.conf. To mount again now: sudo systemctl restart big-mount"
+msgstr "Asetukset: /etc/big-mount.conf. Liitä ne uudelleen nyt: sudo systemctl restart big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:38
+msgid "Diagnosis of devices, safe removal and file rescue: big-storage-rescue (package big-storage-rescue)."
+msgstr "Laitteiden diagnoosi, turvallinen poisto ja tiedostojen pelastus: big-storage-rescue (paketti big-storage-rescue)."
+
+#: big-mount/usr/lib/big-mount/cli.sh:56 big-mount/usr/lib/big-mount/cli.sh:268
+msgid "bigmount: unknown option '%s' (see bigmount --help)"
+msgstr "bigmount: tuntematon valitsin '%s' (katso bigmount --help)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:72
+msgid "bigmount: Secure Erase is no longer part of Big-Mount."
+msgstr "bigmount: Secure Erase ei ole enää osa Big-Mountia."
+
+#: big-mount/usr/lib/big-mount/cli.sh:78
+msgid "bigmount: %s moved to Big Storage Rescue. Use: %s"
+msgstr "bigmount: %s on siirretty Big Storage Rescue -sovellukseen. Käytä: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:80
+msgid "Install it with: sudo pacman -S big-storage-rescue"
+msgstr "Asenna se komennolla: sudo pacman -S big-storage-rescue"
+
+#: big-mount/usr/lib/big-mount/cli.sh:127
+msgid "source checkout (not installed by a package)"
+msgstr "lähdekoodikopio (ei paketin asentama)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "package:"
+msgstr "paketti:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "revision:"
+msgstr "revisio:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "source:"
+msgstr "lähde:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:144
+msgid "unknown"
+msgstr "tuntematon"
+
+#: big-mount/usr/lib/big-mount/cli.sh:187
+msgid "Missing file of the package: %s"
+msgstr "Paketin tiedosto puuttuu: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:188
+#: big-mount/usr/lib/big-mount/cli.sh:197
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Reinstall the big-mount package."
+msgstr "Asenna big-mount-paketti uudelleen."
+
+#: big-mount/usr/lib/big-mount/cli.sh:196
+msgid "Unsafe owner or permissions: %s (%s)"
+msgstr "Turvaton omistaja tai turvattomat oikeudet: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:204
+msgid "Boot service (big-mount.service)"
+msgstr "Käynnistyspalvelu (big-mount.service)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:206
+msgid "/etc/bigmountall-no exists: mounting at boot is disabled on purpose"
+msgstr "/etc/bigmountall-no on olemassa: liittäminen käynnistyksessä on tarkoituksella poissa käytöstä"
+
+#: big-mount/usr/lib/big-mount/cli.sh:218
+msgid "Enabled at boot"
+msgstr "Käytössä käynnistyksessä"
+
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Not found by systemd"
+msgstr "systemd ei löydä sitä"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Not enabled at boot (%s)"
+msgstr "Ei käytössä käynnistyksessä (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Enable it: sudo systemctl enable big-mount"
+msgstr "Ota se käyttöön: sudo systemctl enable big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:223
+msgid "Ran in this boot"
+msgstr "Suoritettiin tällä käynnistyskerralla"
+
+#: big-mount/usr/lib/big-mount/cli.sh:225
+msgid "State in this boot: %s (%s)"
+msgstr "Tila tällä käynnistyskerralla: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:226
+msgid "See: journalctl -b -u big-mount"
+msgstr "Katso: journalctl -b -u big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:229
+msgid "The unit is replaced by %s"
+msgstr "Yksikön korvaa %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:230
+msgid "A copy in /etc/systemd/system overrides the package: remove it unless it is intended."
+msgstr "Kopio hakemistossa /etc/systemd/system ohittaa paketin: poista se, ellei se ole tarkoituksellinen."
+
+#: big-mount/usr/lib/big-mount/cli.sh:232
+msgid "Drop-in files change the unit: %s"
+msgstr "Lisäosatiedostot muuttavat yksikköä: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:242
+msgid "Partitions handled by Big-Mount at boot: %d"
+msgstr "Big-Mountin käynnistyksessä käsittelemät osiot: %d"
+
+#: big-mount/usr/lib/big-mount/cli.sh:243
+msgid "Failed at boot"
+msgstr "Epäonnistui käynnistyksessä"
+
+#: big-mount/usr/lib/big-mount/cli.sh:244
+msgid "Mounted read-only at boot"
+msgstr "Liitetty käynnistyksessä vain luku -tilassa"
+
+#: big-mount/usr/lib/big-mount/cli.sh:250
+msgid "Configuration: PERMISSIONS=%s"
+msgstr "Asetukset: PERMISSIONS=%s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:251
+msgid "Configuration: unknown PERMISSIONS value, shared is used"
+msgstr "Asetukset: tuntematon PERMISSIONS-arvo, käytetään arvoa shared"
+
+#: big-mount/usr/lib/big-mount/cli.sh:259
+msgid "Warnings in the journal of this boot"
+msgstr "Varoituksia tämän käynnistyskerran lokissa"
+
+#: big-mount/usr/lib/big-mount/cli.sh:262
+msgid "The journal is not readable by this user: boot messages not checked"
+msgstr "Tämä käyttäjä ei voi lukea lokia: käynnistysviestejä ei tarkistettu"
+
+#: big-mount/usr/lib/big-mount/cli.sh:273
+msgid "Big-Mount check (nothing is changed; labels and mount points are left out)"
+msgstr "Big-Mountin tarkistus (mitään ei muuteta; nimiöt ja liitoskohdat jätetään pois)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:277
+msgid "Result: %d problem(s), %d warning(s)."
+msgstr "Tulos: ongelmia %d, varoituksia %d."
+
+#: big-mount/usr/lib/big-mount/cli.sh:279
+msgid "Why a partition is read-only or failed to mount, and the health of its drive: big-storage-rescue --diagnose DEVICE"
+msgstr "Miksi osio on vain luku -tilassa tai miksi sen liittäminen epäonnistui, sekä osion aseman kunto: big-storage-rescue --diagnose LAITE"
+
+#: big-mount/usr/lib/big-mount/cli.sh:281
+msgid "To find out why a partition is read-only or failed to mount, install big-storage-rescue."
+msgstr "Jos haluat selvittää, miksi osio on vain luku -tilassa tai miksi sen liittäminen epäonnistui, asenna big-storage-rescue."

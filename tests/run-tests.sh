@@ -871,10 +871,15 @@ test_options_and_moved_commands() {
 
 test_nothing_but_the_automount() {
     begin "nothing-but-the-automount"
-    local lib="$REPO/big-mount/usr/lib/big-mount" files
-    files="$(cd "$REPO/big-mount" && find . -type f | sed 's|^\./||' | sort | tr '\n' ' ')"
-    ASSERT_MSG="only the automount is shipped (got: $files)"
-    assert_true test "$files" = "etc/big-mount.conf usr/bin/bigmount usr/lib/big-mount/cli.sh usr/lib/systemd/system/big-mount.service usr/share/libalpm/hooks/big-mount.hook usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo "
+    local lib="$REPO/big-mount/usr/lib/big-mount" files expect l
+    files="$(cd "$REPO/big-mount" && find . -type f | sed 's|^\./||' | sort)"
+    expect="$(
+        printf '%s\n' etc/big-mount.conf usr/bin/bigmount usr/lib/big-mount/cli.sh \
+            usr/lib/systemd/system/big-mount.service usr/share/libalpm/hooks/big-mount.hook
+        while read -r l; do echo "usr/share/locale/$l/LC_MESSAGES/big-mount.mo"; done < "$REPO/locale/LINGUAS"
+    )"
+    ASSERT_MSG="only the automount and its translations are shipped (got: $(tr '\n' ' ' <<< "$files"))"
+    assert_true test "$files" = "$(sort <<< "$expect")"
     code() { grep -rniE "$1" "$REPO/big-mount/usr/bin" "$lib" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#'; }
     ASSERT_MSG="no Python, GTK or dialog anywhere"; assert_false code 'python|gi\.repository|gtk|libadwaita|kdialog|zenity|notify-send|pkexec'
     ASSERT_MSG="no copy, image or recovery tool"; assert_false code '\b(rsync|ddrescue|testdisk|photorec|smartctl|lsof)\b' 

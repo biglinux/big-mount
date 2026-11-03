@@ -6,9 +6,9 @@
 | --- | --- | --- |
 | `tests/run-tests.sh new` | stubs for `blkid`, `lsblk`, `udevadm`, `udisksctl`, `findmnt`, `mount`, `ntfsfix`; paths rewritten to a scratch dir | **115 passed, 0 failed** |
 | `tests/run-tests.sh old` | the original script (byte for byte the `biglinux-stable` package 25.12.23), as a reference | its failures are the bugs that were fixed (46 passed, 63 failed) |
-| `tests/lib-tests.sh` | the library with simulated facts | **261 passed, 0 failed** |
-| `tests/i18n-tests.sh` | the catalog, the generated resources, runtime language selection | **38 passed, 0 failed** |
-| `tests/package-check.sh` | `package()` of the PKGBUILD on the checkout | **99 passed, 0 failed** |
+| `tests/lib-tests.sh` | the library with simulated facts | **263 passed, 0 failed** |
+| `tests/i18n-tests.sh` | the 31 catalogs, the generated resources, runtime language selection | **248 passed, 0 failed** |
+| `tests/package-check.sh` | `package()` of the PKGBUILD on the checkout | **128 passed, 0 failed** |
 | `tests/integration.sh` | disposable images as loop devices mounted by UDisks2, no root; GUI flows with scripted clicks; `BM=/usr/bin/bigmount` tests the installed package | **133 passed, 0 failed, 1 skipped** |
 | `shellcheck -x` | shipped code, tests, locale scripts | no findings |
 | `bash -n`, `msgfmt --check`, `desktop-file-validate`, `xmllint`, `systemd-analyze verify` | — | pass (part of the suites above) |

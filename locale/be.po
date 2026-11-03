@@ -1,0 +1,278 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: big-mount\n"
+"PO-Revision-Date: 2026-11-01 12:00-0300\n"
+"Last-Translator: BigLinux\n"
+"Language-Team: Belarusian\n"
+"Language: be\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#: big-mount/usr/bin/bigmount:84
+msgid "bigmount: mounting the internal partitions needs administrator rights. big-mount.service does it at every boot."
+msgstr "bigmount: для мантавання ўнутраных раздзелаў патрэбныя правы адміністратара. big-mount.service робіць гэта пры кожнай загрузцы."
+
+#: big-mount/usr/bin/bigmount:85
+msgid "To mount them now:            sudo systemctl restart big-mount"
+msgstr "Каб прымантаваць іх зараз:              sudo systemctl restart big-mount"
+
+#: big-mount/usr/bin/bigmount:86
+msgid "To see what would be mounted: bigmount --dry-run"
+msgstr "Каб паглядзець, што будзе прымантавана: bigmount --dry-run"
+
+#: big-mount/usr/bin/bigmount:87
+msgid "To check the installation:    bigmount --doctor"
+msgstr "Каб праверыць усталяванне:              bigmount --doctor"
+
+#: big-mount/usr/bin/bigmount:97
+msgid "cannot open the lock file /run/lock/big-mount.lock, giving up"
+msgstr "не ўдалося адкрыць файл блакавання /run/lock/big-mount.lock, выхад"
+
+#: big-mount/usr/bin/bigmount:102
+msgid "another bigmount is still running, giving up"
+msgstr "іншы экзэмпляр bigmount яшчэ працуе, выхад"
+
+#: big-mount/usr/bin/bigmount:144
+msgid "last login '%s' is not a known account, ignoring it"
+msgstr "апошні ўваход '%s' не адпавядае ніводнаму вядомаму ўліковаму запісу, ігнаруецца"
+
+#: big-mount/usr/bin/bigmount:165
+msgid "/etc/big-mount.conf: unknown value '%s', using shared"
+msgstr "/etc/big-mount.conf: невядомае значэнне '%s', ужываецца shared"
+
+#: big-mount/usr/bin/bigmount:284
+msgid "%s: skipped, %s is not a filesystem"
+msgstr "%s: прапушчана, %s не файлавая сістэма"
+
+#: big-mount/usr/bin/bigmount:290
+msgid "%s: skipped, virtual device"
+msgstr "%s: прапушчана, віртуальная прылада"
+
+#: big-mount/usr/bin/bigmount:297
+msgid "%s: skipped, already mounted"
+msgstr "%s: прапушчана, ужо прымантавана"
+
+#: big-mount/usr/bin/bigmount:333
+msgid "waiting for udev to finish processing %s"
+msgstr "чаканне, пакуль udev завершыць апрацоўку %s"
+
+#: big-mount/usr/bin/bigmount:383
+msgid "%s: udev has no information about it yet, not mounting"
+msgstr "%s: у udev пакуль няма звестак пра яе, не мантуецца"
+
+#: big-mount/usr/bin/bigmount:387
+msgid "%s: skipped, hidden by udev/UDisks (UDISKS_IGNORE)"
+msgstr "%s: прапушчана, схавана праз udev/UDisks (UDISKS_IGNORE)"
+
+#: big-mount/usr/bin/bigmount:395
+msgid "%s: left to UDisks, external device (%s)"
+msgstr "%s: пакінута для UDisks, знешняя прылада (%s)"
+
+#: big-mount/usr/bin/bigmount:401
+msgid "%s: skipped, listed in /etc/fstab"
+msgstr "%s: прапушчана, ёсць у /etc/fstab"
+
+#: big-mount/usr/bin/bigmount:453
+msgid "%s: device changed during the scan, not mounting"
+msgstr "%s: прылада змянілася падчас сканавання, не мантуецца"
+
+#: big-mount/usr/bin/bigmount:479
+msgid "%s: NTFS refused read-write mount (%s), retrying read-only"
+msgstr "%s: NTFS адмовілася мантавацца для чытання і запісу (%s), паўторная спроба толькі для чытання"
+
+#: big-mount/usr/bin/bigmount:496
+msgid "%s: mount of %s on %s failed (exit %s)"
+msgstr "%s: не ўдалося прымантаваць як %s у %s (код выхаду %s)"
+
+#: big-mount/usr/bin/bigmount:517
+msgid "%s: the driver mounted %s read-only on its own (%s)"
+msgstr "%s: драйвер %s сам прымантаваў яе толькі для чытання (%s)"
+
+#: big-mount/usr/bin/bigmount:524
+msgid "%s: would be mounted %s on %s (%s)"
+msgstr "%s: была б прымантавана як %s у %s (%s)"
+
+#: big-mount/usr/bin/bigmount:526
+msgid "%s: mounted %s on %s (%s)"
+msgstr "%s: прымантавана як %s у %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:28
+msgid "Usage: bigmount [OPTION]"
+msgstr "Выкарыстанне: bigmount [ПАРАМЕТР]"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "(none)"
+msgstr "(без параметра)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "mount internal partitions (run at boot by big-mount.service)"
+msgstr "прымантаваць унутраныя раздзелы (запускаецца пры загрузцы праз big-mount.service)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:33
+msgid "show what would be mounted, change nothing"
+msgstr "паказаць, што будзе прымантавана, нічога не змяняючы"
+
+#: big-mount/usr/lib/big-mount/cli.sh:34
+msgid "check the boot service and what it did in this boot"
+msgstr "праверыць службу загрузкі і тое, што яна зрабіла пры гэтай загрузцы"
+
+#: big-mount/usr/lib/big-mount/cli.sh:35
+msgid "show the version and the source revision"
+msgstr "паказаць версію і рэвізію зыходнага кода"
+
+#: big-mount/usr/lib/big-mount/cli.sh:36
+msgid "show this help"
+msgstr "паказаць гэтую даведку"
+
+#: big-mount/usr/lib/big-mount/cli.sh:37
+msgid "Configuration: /etc/big-mount.conf. To mount again now: sudo systemctl restart big-mount"
+msgstr "Канфігурацыя: /etc/big-mount.conf. Каб зноў прымантаваць іх зараз: sudo systemctl restart big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:38
+msgid "Diagnosis of devices, safe removal and file rescue: big-storage-rescue (package big-storage-rescue)."
+msgstr "Дыягностыка прылад, бяспечнае выманне і выратаванне файлаў: big-storage-rescue (пакет big-storage-rescue)."
+
+#: big-mount/usr/lib/big-mount/cli.sh:56 big-mount/usr/lib/big-mount/cli.sh:268
+msgid "bigmount: unknown option '%s' (see bigmount --help)"
+msgstr "bigmount: невядомы параметр '%s' (гл. bigmount --help)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:72
+msgid "bigmount: Secure Erase is no longer part of Big-Mount."
+msgstr "bigmount: бяспечная ачыстка больш не ўваходзіць у Big-Mount."
+
+#: big-mount/usr/lib/big-mount/cli.sh:78
+msgid "bigmount: %s moved to Big Storage Rescue. Use: %s"
+msgstr "bigmount: параметр %s перанесены ў Big Storage Rescue. Выкарыстоўвайце: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:80
+msgid "Install it with: sudo pacman -S big-storage-rescue"
+msgstr "Усталюйце яго камандай: sudo pacman -S big-storage-rescue"
+
+#: big-mount/usr/lib/big-mount/cli.sh:127
+msgid "source checkout (not installed by a package)"
+msgstr "рабочая копія зыходнага кода (не ўсталявана з пакета)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "package:"
+msgstr "пакет:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "revision:"
+msgstr "рэвізія:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "source:"
+msgstr "зыходны код:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:144
+msgid "unknown"
+msgstr "невядома"
+
+#: big-mount/usr/lib/big-mount/cli.sh:187
+msgid "Missing file of the package: %s"
+msgstr "Адсутнічае файл пакета: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:188
+#: big-mount/usr/lib/big-mount/cli.sh:197
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Reinstall the big-mount package."
+msgstr "Пераўсталюйце пакет big-mount."
+
+#: big-mount/usr/lib/big-mount/cli.sh:196
+msgid "Unsafe owner or permissions: %s (%s)"
+msgstr "Небяспечны ўладальнік або правы доступу: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:204
+msgid "Boot service (big-mount.service)"
+msgstr "Служба загрузкі (big-mount.service)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:206
+msgid "/etc/bigmountall-no exists: mounting at boot is disabled on purpose"
+msgstr "/etc/bigmountall-no існуе: мантаванне пры загрузцы наўмысна адключана"
+
+#: big-mount/usr/lib/big-mount/cli.sh:218
+msgid "Enabled at boot"
+msgstr "Уключана пры загрузцы"
+
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Not found by systemd"
+msgstr "systemd яе не знаходзіць"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Not enabled at boot (%s)"
+msgstr "Не ўключана пры загрузцы (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Enable it: sudo systemctl enable big-mount"
+msgstr "Уключыце яе: sudo systemctl enable big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:223
+msgid "Ran in this boot"
+msgstr "Выконвалася пры гэтай загрузцы"
+
+#: big-mount/usr/lib/big-mount/cli.sh:225
+msgid "State in this boot: %s (%s)"
+msgstr "Стан пры гэтай загрузцы: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:226
+msgid "See: journalctl -b -u big-mount"
+msgstr "Гл.: journalctl -b -u big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:229
+msgid "The unit is replaced by %s"
+msgstr "Модуль заменены на %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:230
+msgid "A copy in /etc/systemd/system overrides the package: remove it unless it is intended."
+msgstr "Копія ў /etc/systemd/system перавызначае пакет: выдаліце яе, калі гэта не наўмысна."
+
+#: big-mount/usr/lib/big-mount/cli.sh:232
+msgid "Drop-in files change the unit: %s"
+msgstr "Модуль змяняюць дадатковыя файлы (drop-in): %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:242
+msgid "Partitions handled by Big-Mount at boot: %d"
+msgstr "Раздзелаў, якія Big-Mount апрацоўвае пры загрузцы: %d"
+
+#: big-mount/usr/lib/big-mount/cli.sh:243
+msgid "Failed at boot"
+msgstr "Збой пры загрузцы"
+
+#: big-mount/usr/lib/big-mount/cli.sh:244
+msgid "Mounted read-only at boot"
+msgstr "Прымантавана толькі для чытання пры загрузцы"
+
+#: big-mount/usr/lib/big-mount/cli.sh:250
+msgid "Configuration: PERMISSIONS=%s"
+msgstr "Канфігурацыя: PERMISSIONS=%s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:251
+msgid "Configuration: unknown PERMISSIONS value, shared is used"
+msgstr "Канфігурацыя: невядомае значэнне PERMISSIONS, ужываецца shared"
+
+#: big-mount/usr/lib/big-mount/cli.sh:259
+msgid "Warnings in the journal of this boot"
+msgstr "Папярэджанні ў журнале гэтай загрузкі"
+
+#: big-mount/usr/lib/big-mount/cli.sh:262
+msgid "The journal is not readable by this user: boot messages not checked"
+msgstr "Гэты карыстальнік не можа чытаць журнал: паведамленні загрузкі не правераны"
+
+#: big-mount/usr/lib/big-mount/cli.sh:273
+msgid "Big-Mount check (nothing is changed; labels and mount points are left out)"
+msgstr "Праверка Big-Mount (нічога не змяняецца; меткі і пункты мантавання не паказваюцца)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:277
+msgid "Result: %d problem(s), %d warning(s)."
+msgstr "Вынік: праблем: %d, папярэджанняў: %d."
+
+#: big-mount/usr/lib/big-mount/cli.sh:279
+msgid "Why a partition is read-only or failed to mount, and the health of its drive: big-storage-rescue --diagnose DEVICE"
+msgstr "Чаму раздзел даступны толькі для чытання або не прымантаваўся, і здароўе яго дыска: big-storage-rescue --diagnose ПРЫЛАДА"
+
+#: big-mount/usr/lib/big-mount/cli.sh:281
+msgid "To find out why a partition is read-only or failed to mount, install big-storage-rescue."
+msgstr "Каб даведацца, чаму раздзел даступны толькі для чытання або не прымантаваўся, усталюйце big-storage-rescue."

@@ -1,0 +1,278 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: big-mount\n"
+"PO-Revision-Date: 2026-11-01 12:00-0300\n"
+"Last-Translator: BigLinux\n"
+"Language-Team: Italian\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: big-mount/usr/bin/bigmount:84
+msgid "bigmount: mounting the internal partitions needs administrator rights. big-mount.service does it at every boot."
+msgstr "bigmount: il montaggio delle partizioni interne richiede i privilegi di amministratore. big-mount.service lo esegue a ogni avvio."
+
+#: big-mount/usr/bin/bigmount:85
+msgid "To mount them now:            sudo systemctl restart big-mount"
+msgstr "Per montarle ora:                 sudo systemctl restart big-mount"
+
+#: big-mount/usr/bin/bigmount:86
+msgid "To see what would be mounted: bigmount --dry-run"
+msgstr "Per vedere cosa verrebbe montato: bigmount --dry-run"
+
+#: big-mount/usr/bin/bigmount:87
+msgid "To check the installation:    bigmount --doctor"
+msgstr "Per verificare l'installazione:   bigmount --doctor"
+
+#: big-mount/usr/bin/bigmount:97
+msgid "cannot open the lock file /run/lock/big-mount.lock, giving up"
+msgstr "impossibile aprire il file di blocco /run/lock/big-mount.lock, operazione interrotta"
+
+#: big-mount/usr/bin/bigmount:102
+msgid "another bigmount is still running, giving up"
+msgstr "un altro bigmount è ancora in esecuzione, operazione interrotta"
+
+#: big-mount/usr/bin/bigmount:144
+msgid "last login '%s' is not a known account, ignoring it"
+msgstr "l'ultimo accesso '%s' non è un account conosciuto, viene ignorato"
+
+#: big-mount/usr/bin/bigmount:165
+msgid "/etc/big-mount.conf: unknown value '%s', using shared"
+msgstr "/etc/big-mount.conf: valore sconosciuto '%s', viene usato shared"
+
+#: big-mount/usr/bin/bigmount:284
+msgid "%s: skipped, %s is not a filesystem"
+msgstr "%s: ignorato, %s non è un file system"
+
+#: big-mount/usr/bin/bigmount:290
+msgid "%s: skipped, virtual device"
+msgstr "%s: ignorato, dispositivo virtuale"
+
+#: big-mount/usr/bin/bigmount:297
+msgid "%s: skipped, already mounted"
+msgstr "%s: ignorato, già montato"
+
+#: big-mount/usr/bin/bigmount:333
+msgid "waiting for udev to finish processing %s"
+msgstr "in attesa che udev finisca di elaborare %s"
+
+#: big-mount/usr/bin/bigmount:383
+msgid "%s: udev has no information about it yet, not mounting"
+msgstr "%s: udev non ha ancora informazioni su di esso, non viene montato"
+
+#: big-mount/usr/bin/bigmount:387
+msgid "%s: skipped, hidden by udev/UDisks (UDISKS_IGNORE)"
+msgstr "%s: ignorato, nascosto da udev/UDisks (UDISKS_IGNORE)"
+
+#: big-mount/usr/bin/bigmount:395
+msgid "%s: left to UDisks, external device (%s)"
+msgstr "%s: lasciato a UDisks, dispositivo esterno (%s)"
+
+#: big-mount/usr/bin/bigmount:401
+msgid "%s: skipped, listed in /etc/fstab"
+msgstr "%s: ignorato, elencato in /etc/fstab"
+
+#: big-mount/usr/bin/bigmount:453
+msgid "%s: device changed during the scan, not mounting"
+msgstr "%s: il dispositivo è cambiato durante la scansione, non viene montato"
+
+#: big-mount/usr/bin/bigmount:479
+msgid "%s: NTFS refused read-write mount (%s), retrying read-only"
+msgstr "%s: NTFS ha rifiutato il montaggio in lettura e scrittura (%s), nuovo tentativo in sola lettura"
+
+#: big-mount/usr/bin/bigmount:496
+msgid "%s: mount of %s on %s failed (exit %s)"
+msgstr "%s: montaggio di %s su %s non riuscito (codice di uscita %s)"
+
+#: big-mount/usr/bin/bigmount:517
+msgid "%s: the driver mounted %s read-only on its own (%s)"
+msgstr "%s: il driver ha montato %s in sola lettura di sua iniziativa (%s)"
+
+#: big-mount/usr/bin/bigmount:524
+msgid "%s: would be mounted %s on %s (%s)"
+msgstr "%s: il file system %s verrebbe montato su %s (%s)"
+
+#: big-mount/usr/bin/bigmount:526
+msgid "%s: mounted %s on %s (%s)"
+msgstr "%s: file system %s montato su %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:28
+msgid "Usage: bigmount [OPTION]"
+msgstr "Uso: bigmount [OPZIONE]"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "(none)"
+msgstr "(nessuna)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "mount internal partitions (run at boot by big-mount.service)"
+msgstr "monta le partizioni interne (eseguito all'avvio da big-mount.service)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:33
+msgid "show what would be mounted, change nothing"
+msgstr "mostra cosa verrebbe montato, senza cambiare nulla"
+
+#: big-mount/usr/lib/big-mount/cli.sh:34
+msgid "check the boot service and what it did in this boot"
+msgstr "verifica il servizio di avvio e cosa ha fatto in questo avvio"
+
+#: big-mount/usr/lib/big-mount/cli.sh:35
+msgid "show the version and the source revision"
+msgstr "mostra la versione e la revisione del sorgente"
+
+#: big-mount/usr/lib/big-mount/cli.sh:36
+msgid "show this help"
+msgstr "mostra questo aiuto"
+
+#: big-mount/usr/lib/big-mount/cli.sh:37
+msgid "Configuration: /etc/big-mount.conf. To mount again now: sudo systemctl restart big-mount"
+msgstr "Configurazione: /etc/big-mount.conf. Per montare di nuovo ora: sudo systemctl restart big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:38
+msgid "Diagnosis of devices, safe removal and file rescue: big-storage-rescue (package big-storage-rescue)."
+msgstr "Diagnosi dei dispositivi, rimozione sicura e messa in salvo dei file: big-storage-rescue (pacchetto big-storage-rescue)."
+
+#: big-mount/usr/lib/big-mount/cli.sh:56 big-mount/usr/lib/big-mount/cli.sh:268
+msgid "bigmount: unknown option '%s' (see bigmount --help)"
+msgstr "bigmount: opzione sconosciuta '%s' (vedi bigmount --help)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:72
+msgid "bigmount: Secure Erase is no longer part of Big-Mount."
+msgstr "bigmount: Secure Erase non fa più parte di Big-Mount."
+
+#: big-mount/usr/lib/big-mount/cli.sh:78
+msgid "bigmount: %s moved to Big Storage Rescue. Use: %s"
+msgstr "bigmount: %s è stato spostato in Big Storage Rescue. Usa: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:80
+msgid "Install it with: sudo pacman -S big-storage-rescue"
+msgstr "Installalo con: sudo pacman -S big-storage-rescue"
+
+#: big-mount/usr/lib/big-mount/cli.sh:127
+msgid "source checkout (not installed by a package)"
+msgstr "copia dei sorgenti (non installata da un pacchetto)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "package:"
+msgstr "pacchetto:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "revision:"
+msgstr "revisione:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "source:"
+msgstr "sorgente:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:144
+msgid "unknown"
+msgstr "sconosciuto"
+
+#: big-mount/usr/lib/big-mount/cli.sh:187
+msgid "Missing file of the package: %s"
+msgstr "File del pacchetto mancante: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:188
+#: big-mount/usr/lib/big-mount/cli.sh:197
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Reinstall the big-mount package."
+msgstr "Reinstalla il pacchetto big-mount."
+
+#: big-mount/usr/lib/big-mount/cli.sh:196
+msgid "Unsafe owner or permissions: %s (%s)"
+msgstr "Proprietario o permessi non sicuri: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:204
+msgid "Boot service (big-mount.service)"
+msgstr "Servizio di avvio (big-mount.service)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:206
+msgid "/etc/bigmountall-no exists: mounting at boot is disabled on purpose"
+msgstr "/etc/bigmountall-no esiste: il montaggio all'avvio è disattivato intenzionalmente"
+
+#: big-mount/usr/lib/big-mount/cli.sh:218
+msgid "Enabled at boot"
+msgstr "Abilitato all'avvio"
+
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Not found by systemd"
+msgstr "Non trovato da systemd"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Not enabled at boot (%s)"
+msgstr "Non abilitato all'avvio (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Enable it: sudo systemctl enable big-mount"
+msgstr "Abilitalo: sudo systemctl enable big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:223
+msgid "Ran in this boot"
+msgstr "Eseguito in questo avvio"
+
+#: big-mount/usr/lib/big-mount/cli.sh:225
+msgid "State in this boot: %s (%s)"
+msgstr "Stato in questo avvio: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:226
+msgid "See: journalctl -b -u big-mount"
+msgstr "Vedi: journalctl -b -u big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:229
+msgid "The unit is replaced by %s"
+msgstr "L'unità systemd è sostituita da %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:230
+msgid "A copy in /etc/systemd/system overrides the package: remove it unless it is intended."
+msgstr "Una copia in /etc/systemd/system sostituisce quella del pacchetto: rimuovila, a meno che non sia voluta."
+
+#: big-mount/usr/lib/big-mount/cli.sh:232
+msgid "Drop-in files change the unit: %s"
+msgstr "Alcuni file drop-in modificano l'unità systemd: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:242
+msgid "Partitions handled by Big-Mount at boot: %d"
+msgstr "Partizioni gestite da Big-Mount all'avvio: %d"
+
+#: big-mount/usr/lib/big-mount/cli.sh:243
+msgid "Failed at boot"
+msgstr "Non riuscite all'avvio"
+
+#: big-mount/usr/lib/big-mount/cli.sh:244
+msgid "Mounted read-only at boot"
+msgstr "Montate in sola lettura all'avvio"
+
+#: big-mount/usr/lib/big-mount/cli.sh:250
+msgid "Configuration: PERMISSIONS=%s"
+msgstr "Configurazione: PERMISSIONS=%s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:251
+msgid "Configuration: unknown PERMISSIONS value, shared is used"
+msgstr "Configurazione: valore di PERMISSIONS sconosciuto, viene usato shared"
+
+#: big-mount/usr/lib/big-mount/cli.sh:259
+msgid "Warnings in the journal of this boot"
+msgstr "Avvisi nel journal di questo avvio"
+
+#: big-mount/usr/lib/big-mount/cli.sh:262
+msgid "The journal is not readable by this user: boot messages not checked"
+msgstr "Il journal non è leggibile da questo utente: messaggi di avvio non controllati"
+
+#: big-mount/usr/lib/big-mount/cli.sh:273
+msgid "Big-Mount check (nothing is changed; labels and mount points are left out)"
+msgstr "Verifica di Big-Mount (non viene modificato nulla; etichette e punti di montaggio vengono omessi)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:277
+msgid "Result: %d problem(s), %d warning(s)."
+msgstr "Risultato: problemi: %d, avvisi: %d."
+
+#: big-mount/usr/lib/big-mount/cli.sh:279
+msgid "Why a partition is read-only or failed to mount, and the health of its drive: big-storage-rescue --diagnose DEVICE"
+msgstr "Perché una partizione è in sola lettura o non è stata montata, e lo stato di salute della sua unità: big-storage-rescue --diagnose DISPOSITIVO"
+
+#: big-mount/usr/lib/big-mount/cli.sh:281
+msgid "To find out why a partition is read-only or failed to mount, install big-storage-rescue."
+msgstr "Per scoprire perché una partizione è in sola lettura o non è stata montata, installa big-storage-rescue."

@@ -13,7 +13,7 @@ desktop, and `/etc/fstab` always wins.
 ![BigLinux](https://img.shields.io/badge/BigLinux-Manjaro%20%7C%20Arch-1793d1)
 ![Bash](https://img.shields.io/badge/written%20in-bash-4eaa25?logo=gnubash&logoColor=white)
 ![systemd](https://img.shields.io/badge/runs%20as-systemd%20service-30d475)
-![Size](https://img.shields.io/badge/installed-40%20KiB-informational)
+![Languages](https://img.shields.io/badge/languages-31-informational)
 
 <img src="docs/images/dry-run.png" alt="sudo bigmount --dry-run on a machine with an NVMe system disk, a Windows NVMe, two SATA data disks, an encrypted disk, a USB hard disk and an SD card" width="860">
 
@@ -38,8 +38,8 @@ desktop, and `/etc/fstab` always wins.
 | **When** | once at every boot, by `big-mount.service`, after the local filesystems |
 | **Never touches** | USB, FireWire, Thunderbolt and SD devices · anything in `/etc/fstab` · LUKS, BitLocker, LVM and RAID members · the EFI and Windows recovery partitions · swap |
 | **Windows** | hibernated or Fast Startup volumes are mounted read-only, never "fixed" (no `ntfsfix`, no deleted hiberfile) |
-| **Footprint** | one bash script, 7 files, 40 KiB, no GUI toolkit, no Python, nothing left running |
-| **Languages** | English and Brazilian Portuguese |
+| **Footprint** | one bash script and its translations, about 290 KiB (33 KiB without the translations), no GUI toolkit, no Python, nothing left running |
+| **Languages** | 31, from Belarusian to Traditional Chinese; any other language falls back to English |
 
 > [!NOTE]
 > Big-Mount **only mounts**. The drive manager, the diagnosis of read-only
@@ -382,21 +382,54 @@ are left in place: remove them by hand if nothing else uses them.
 
 ## 🌐 Translations
 
-Every message shown on a terminal is translated; the journal stays in English.
-Brazilian Portuguese is included:
+Every message shown on a terminal follows the system language (`LANGUAGE`,
+`LC_ALL`, `LC_MESSAGES`, `LANG`); boot messages stay in English in the
+journal. A language or a message without translation falls back to English.
 
 <img src="docs/images/help-pt.png" alt="bigmount --help in Brazilian Portuguese" width="720">
 
-To add a language: `locale/update-pot.sh`, copy `locale/big-mount.pot` to
-`locale/<lang>.po`, translate it, add the code to `locale/LINGUAS` and run
-`locale/compile.sh`.
+| | |
+| --- | --- |
+| **Included (31)** | Belarusian `be` · Bulgarian `bg` · Chinese, Simplified `zh_CN` · Chinese, Traditional `zh_TW` · Croatian `hr` · Czech `cs` · Danish `da` · Dutch `nl` · English `en` · Estonian `et` · Finnish `fi` · French `fr` · German `de` · Greek `el` · Hebrew `he` · Hungarian `hu` · Icelandic `is` · Italian `it` · Japanese `ja` · Korean `ko` · Norwegian Bokmål `nb` · Polish `pl` · Portuguese `pt` · Portuguese, Brazil `pt_BR` · Romanian `ro` · Russian `ru` · Slovak `sk` · Swedish `sv` · Turkish `tr` · Ukrainian `uk` |
+| **Columns** | tables are aligned by terminal columns, so accents and CJK text line up |
+
+```text
+locale/
+├── big-mount.pot     template with every message
+├── <lang>.po         one catalog per language
+├── LINGUAS           languages to build
+├── update-pot.sh     extracts the messages and merges them into every .po
+└── compile.sh        builds big-mount/usr/share/locale/<lang>/LC_MESSAGES/big-mount.mo
+```
+
+To add a language, for example Catalan:
+
+```bash
+msginit --no-translator -l ca -i locale/big-mount.pot -o locale/ca.po
+echo ca >> locale/LINGUAS
+# translate locale/ca.po
+bash locale/compile.sh
+bash tests/i18n-tests.sh
+```
+
+After changing a message in the code:
+
+```bash
+bash locale/update-pot.sh   # new entries appear untranslated, changed ones as fuzzy
+# review every fuzzy entry: msgmerge's guesses are usually wrong
+bash locale/compile.sh
+bash tests/i18n-tests.sh    # fails on untranslated, fuzzy or mismatched %s/%d
+```
+
+Keep data out of the format: `printf $"%s: mounted %s on %s (%s)" "$DEV" …`,
+never a variable inside `$"..."`.
 
 ## 🧪 Development
 
 ```bash
-bash tests/run-tests.sh new     # the boot run against stubbed devices (132 checks)
-bash tests/i18n-tests.sh        # translations (26 checks)
-bash tests/package-check.sh     # package() on this checkout (36 checks)
+bash tests/run-tests.sh new     # the boot run against stubbed devices
+bash tests/i18n-tests.sh        # translations
+bash tests/package-check.sh     # package() on this checkout
 bash tests/bench.sh big-mount/usr/bin/bigmount   # the boot run on the real devices, mount stubbed
 tests/manual-check.sh           # after a real boot with the package installed
 ```

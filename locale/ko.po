@@ -1,0 +1,278 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: big-mount\n"
+"PO-Revision-Date: 2026-11-01 12:00-0300\n"
+"Last-Translator: BigLinux\n"
+"Language-Team: Korean\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: big-mount/usr/bin/bigmount:84
+msgid "bigmount: mounting the internal partitions needs administrator rights. big-mount.service does it at every boot."
+msgstr "bigmount: 내부 파티션을 마운트하려면 관리자 권한이 필요합니다. 부팅할 때마다 big-mount.service가 마운트합니다."
+
+#: big-mount/usr/bin/bigmount:85
+msgid "To mount them now:            sudo systemctl restart big-mount"
+msgstr "지금 마운트하려면:      sudo systemctl restart big-mount"
+
+#: big-mount/usr/bin/bigmount:86
+msgid "To see what would be mounted: bigmount --dry-run"
+msgstr "마운트될 항목을 보려면: bigmount --dry-run"
+
+#: big-mount/usr/bin/bigmount:87
+msgid "To check the installation:    bigmount --doctor"
+msgstr "설치 상태를 점검하려면: bigmount --doctor"
+
+#: big-mount/usr/bin/bigmount:97
+msgid "cannot open the lock file /run/lock/big-mount.lock, giving up"
+msgstr "잠금 파일을 열 수 없어 중단합니다: /run/lock/big-mount.lock"
+
+#: big-mount/usr/bin/bigmount:102
+msgid "another bigmount is still running, giving up"
+msgstr "다른 bigmount 프로세스가 아직 실행 중이어서 중단합니다"
+
+#: big-mount/usr/bin/bigmount:144
+msgid "last login '%s' is not a known account, ignoring it"
+msgstr "마지막 로그인 계정 '%s'을(를) 알 수 없어 무시합니다"
+
+#: big-mount/usr/bin/bigmount:165
+msgid "/etc/big-mount.conf: unknown value '%s', using shared"
+msgstr "/etc/big-mount.conf: 알 수 없는 값 '%s', shared를 사용합니다"
+
+#: big-mount/usr/bin/bigmount:284
+msgid "%s: skipped, %s is not a filesystem"
+msgstr "%s: 건너뜀, %s 형식은 파일 시스템이 아님"
+
+#: big-mount/usr/bin/bigmount:290
+msgid "%s: skipped, virtual device"
+msgstr "%s: 건너뜀, 가상 장치"
+
+#: big-mount/usr/bin/bigmount:297
+msgid "%s: skipped, already mounted"
+msgstr "%s: 건너뜀, 이미 마운트됨"
+
+#: big-mount/usr/bin/bigmount:333
+msgid "waiting for udev to finish processing %s"
+msgstr "udev가 %s 처리를 마칠 때까지 기다리는 중"
+
+#: big-mount/usr/bin/bigmount:383
+msgid "%s: udev has no information about it yet, not mounting"
+msgstr "%s: udev에 아직 이 장치의 정보가 없어 마운트하지 않습니다"
+
+#: big-mount/usr/bin/bigmount:387
+msgid "%s: skipped, hidden by udev/UDisks (UDISKS_IGNORE)"
+msgstr "%s: 건너뜀, udev/UDisks에서 숨김 (UDISKS_IGNORE)"
+
+#: big-mount/usr/bin/bigmount:395
+msgid "%s: left to UDisks, external device (%s)"
+msgstr "%s: UDisks에 맡김, 외부 장치 (%s)"
+
+#: big-mount/usr/bin/bigmount:401
+msgid "%s: skipped, listed in /etc/fstab"
+msgstr "%s: 건너뜀, /etc/fstab에 있음"
+
+#: big-mount/usr/bin/bigmount:453
+msgid "%s: device changed during the scan, not mounting"
+msgstr "%s: 검사 중에 장치가 바뀌어 마운트하지 않습니다"
+
+#: big-mount/usr/bin/bigmount:479
+msgid "%s: NTFS refused read-write mount (%s), retrying read-only"
+msgstr "%s: NTFS가 읽기/쓰기 마운트를 거부함 (%s), 읽기 전용으로 다시 시도합니다"
+
+#: big-mount/usr/bin/bigmount:496
+msgid "%s: mount of %s on %s failed (exit %s)"
+msgstr "%s: %s 파일 시스템을 %s에 마운트하지 못했습니다 (종료 코드 %s)"
+
+#: big-mount/usr/bin/bigmount:517
+msgid "%s: the driver mounted %s read-only on its own (%s)"
+msgstr "%s: 드라이버가 %s 파일 시스템을 스스로 읽기 전용으로 마운트했습니다 (%s)"
+
+#: big-mount/usr/bin/bigmount:524
+msgid "%s: would be mounted %s on %s (%s)"
+msgstr "%s: %s 파일 시스템을 %s에 마운트할 예정 (%s)"
+
+#: big-mount/usr/bin/bigmount:526
+msgid "%s: mounted %s on %s (%s)"
+msgstr "%s: %s 파일 시스템을 %s에 마운트함 (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:28
+msgid "Usage: bigmount [OPTION]"
+msgstr "사용법: bigmount [옵션]"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "(none)"
+msgstr "(없음)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:31
+msgid "mount internal partitions (run at boot by big-mount.service)"
+msgstr "내부 파티션 마운트 (부팅 시 big-mount.service가 실행)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:33
+msgid "show what would be mounted, change nothing"
+msgstr "마운트될 항목만 표시하고 아무것도 바꾸지 않음"
+
+#: big-mount/usr/lib/big-mount/cli.sh:34
+msgid "check the boot service and what it did in this boot"
+msgstr "부팅 서비스와 이번 부팅에서 수행한 작업 점검"
+
+#: big-mount/usr/lib/big-mount/cli.sh:35
+msgid "show the version and the source revision"
+msgstr "버전과 소스 리비전 표시"
+
+#: big-mount/usr/lib/big-mount/cli.sh:36
+msgid "show this help"
+msgstr "이 도움말 표시"
+
+#: big-mount/usr/lib/big-mount/cli.sh:37
+msgid "Configuration: /etc/big-mount.conf. To mount again now: sudo systemctl restart big-mount"
+msgstr "설정: /etc/big-mount.conf. 지금 다시 마운트하려면: sudo systemctl restart big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:38
+msgid "Diagnosis of devices, safe removal and file rescue: big-storage-rescue (package big-storage-rescue)."
+msgstr "장치 진단, 안전한 제거, 파일 구출: big-storage-rescue (big-storage-rescue 패키지)."
+
+#: big-mount/usr/lib/big-mount/cli.sh:56 big-mount/usr/lib/big-mount/cli.sh:268
+msgid "bigmount: unknown option '%s' (see bigmount --help)"
+msgstr "bigmount: 알 수 없는 옵션 '%s' (bigmount --help 참조)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:72
+msgid "bigmount: Secure Erase is no longer part of Big-Mount."
+msgstr "bigmount: 보안 소거는 더 이상 Big-Mount에 포함되지 않습니다."
+
+#: big-mount/usr/lib/big-mount/cli.sh:78
+msgid "bigmount: %s moved to Big Storage Rescue. Use: %s"
+msgstr "bigmount: %s 기능은 Big Storage Rescue로 옮겨졌습니다. 다음을 사용하십시오: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:80
+msgid "Install it with: sudo pacman -S big-storage-rescue"
+msgstr "설치하려면: sudo pacman -S big-storage-rescue"
+
+#: big-mount/usr/lib/big-mount/cli.sh:127
+msgid "source checkout (not installed by a package)"
+msgstr "소스 체크아웃 (패키지로 설치되지 않음)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "package:"
+msgstr "패키지:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "revision:"
+msgstr "리비전:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:136
+msgid "source:"
+msgstr "소스:"
+
+#: big-mount/usr/lib/big-mount/cli.sh:144
+msgid "unknown"
+msgstr "알 수 없음"
+
+#: big-mount/usr/lib/big-mount/cli.sh:187
+msgid "Missing file of the package: %s"
+msgstr "패키지 파일이 없음: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:188
+#: big-mount/usr/lib/big-mount/cli.sh:197
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Reinstall the big-mount package."
+msgstr "big-mount 패키지를 다시 설치하십시오."
+
+#: big-mount/usr/lib/big-mount/cli.sh:196
+msgid "Unsafe owner or permissions: %s (%s)"
+msgstr "안전하지 않은 소유자 또는 권한: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:204
+msgid "Boot service (big-mount.service)"
+msgstr "부팅 서비스 (big-mount.service)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:206
+msgid "/etc/bigmountall-no exists: mounting at boot is disabled on purpose"
+msgstr "/etc/bigmountall-no 파일이 있음: 부팅 시 마운트를 의도적으로 껐음"
+
+#: big-mount/usr/lib/big-mount/cli.sh:218
+msgid "Enabled at boot"
+msgstr "부팅 시 사용함"
+
+#: big-mount/usr/lib/big-mount/cli.sh:219
+msgid "Not found by systemd"
+msgstr "systemd에서 찾을 수 없음"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Not enabled at boot (%s)"
+msgstr "부팅 시 사용 안 함 (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:220
+msgid "Enable it: sudo systemctl enable big-mount"
+msgstr "사용하도록 설정하십시오: sudo systemctl enable big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:223
+msgid "Ran in this boot"
+msgstr "이번 부팅에서 실행됨"
+
+#: big-mount/usr/lib/big-mount/cli.sh:225
+msgid "State in this boot: %s (%s)"
+msgstr "이번 부팅의 상태: %s (%s)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:226
+msgid "See: journalctl -b -u big-mount"
+msgstr "참조: journalctl -b -u big-mount"
+
+#: big-mount/usr/lib/big-mount/cli.sh:229
+msgid "The unit is replaced by %s"
+msgstr "유닛이 다음으로 대체됨: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:230
+msgid "A copy in /etc/systemd/system overrides the package: remove it unless it is intended."
+msgstr "/etc/systemd/system의 사본이 패키지를 덮어씁니다: 의도한 것이 아니라면 제거하십시오."
+
+#: big-mount/usr/lib/big-mount/cli.sh:232
+msgid "Drop-in files change the unit: %s"
+msgstr "드롭인 파일이 유닛을 변경함: %s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:242
+msgid "Partitions handled by Big-Mount at boot: %d"
+msgstr "부팅 시 Big-Mount가 처리한 파티션: %d개"
+
+#: big-mount/usr/lib/big-mount/cli.sh:243
+msgid "Failed at boot"
+msgstr "부팅 시 실패함"
+
+#: big-mount/usr/lib/big-mount/cli.sh:244
+msgid "Mounted read-only at boot"
+msgstr "부팅 시 읽기 전용으로 마운트됨"
+
+#: big-mount/usr/lib/big-mount/cli.sh:250
+msgid "Configuration: PERMISSIONS=%s"
+msgstr "설정: PERMISSIONS=%s"
+
+#: big-mount/usr/lib/big-mount/cli.sh:251
+msgid "Configuration: unknown PERMISSIONS value, shared is used"
+msgstr "설정: 알 수 없는 PERMISSIONS 값, shared를 사용함"
+
+#: big-mount/usr/lib/big-mount/cli.sh:259
+msgid "Warnings in the journal of this boot"
+msgstr "이번 부팅의 저널에 경고가 있음"
+
+#: big-mount/usr/lib/big-mount/cli.sh:262
+msgid "The journal is not readable by this user: boot messages not checked"
+msgstr "현재 사용자는 저널을 읽을 수 없음: 부팅 메시지를 확인하지 않음"
+
+#: big-mount/usr/lib/big-mount/cli.sh:273
+msgid "Big-Mount check (nothing is changed; labels and mount points are left out)"
+msgstr "Big-Mount 점검 (아무것도 바꾸지 않으며 레이블과 마운트 지점은 제외함)"
+
+#: big-mount/usr/lib/big-mount/cli.sh:277
+msgid "Result: %d problem(s), %d warning(s)."
+msgstr "결과: 문제 %d개, 경고 %d개."
+
+#: big-mount/usr/lib/big-mount/cli.sh:279
+msgid "Why a partition is read-only or failed to mount, and the health of its drive: big-storage-rescue --diagnose DEVICE"
+msgstr "파티션이 읽기 전용이거나 마운트되지 않은 이유와 해당 드라이브의 건강 상태: big-storage-rescue --diagnose 장치"
+
+#: big-mount/usr/lib/big-mount/cli.sh:281
+msgid "To find out why a partition is read-only or failed to mount, install big-storage-rescue."
+msgstr "파티션이 읽기 전용이거나 마운트되지 않은 이유를 알아보려면 big-storage-rescue를 설치하십시오."

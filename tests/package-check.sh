@@ -68,8 +68,8 @@ expect=(
     "644 usr/lib/systemd/system/big-mount.service"
     "644 usr/share/libalpm/hooks/big-mount.hook"
     "644 etc/big-mount.conf"
-    "644 usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo"
 )
+while read -r l; do expect+=("644 usr/share/locale/$l/LC_MESSAGES/big-mount.mo"); done < locale/LINGUAS
 for e in "${expect[@]}"; do
     mode="${e%% *}" f="${e#* }"
     check "$f ($mode)" bash -c '[ -f "$1/$2" ] && [ "$(stat -c %a "$1/$2")" = "$3" ]' _ "$P" "$f" "$mode"
@@ -77,8 +77,6 @@ done
 installed="$(cd "$P" && find . -type f | sed 's|^\./||' | sort)"
 check "nothing else is installed (no docs, tests, templates, scratch files)" \
     test "$installed" = "$(printf '%s\n' "${expect[@]}" | cut -d' ' -f2 | sort)"
-check "every translation in locale/LINGUAS is installed" \
-    bash -c 'while read -r l; do [ -f "$1/usr/share/locale/$l/LC_MESSAGES/big-mount.mo" ] || exit 1; done < locale/LINGUAS' _ "$P"
 
 begin "metadata"
 pkginfo="$(source pkgbuild/PKGBUILD 2>/dev/null; printf 'source=%s\n' "${source[*]}"; printf 'depends=%s\n' "${depends[*]}"; printf 'backup=%s\n' "${backup[*]}"; printf 'install=%s\n' "${install:-}"; printf 'url=%s\n' "$url")"
@@ -96,7 +94,9 @@ check "big-storage-rescue is optional, never required, never in conflict" \
 check "no file shared with big-storage-rescue" bash -c '! grep -E "storage-rescue|bsr-" <<< "$1"' _ "$installed"
 
 begin "installed files are valid"
-check "translation catalog loads" msgunfmt -o /dev/null "$P/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo"
+while read -r l; do
+    check "translation catalog loads ($l)" msgunfmt -o /dev/null "$P/usr/share/locale/$l/LC_MESSAGES/big-mount.mo"
+done < locale/LINGUAS
 if command -v systemd-analyze >/dev/null; then
     # It also reports on the units it loads with this one, and on the machine it runs
     # on: those are shown, and only what is about this unit counts against it

@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | `depends` | bash, util-linux, udisks2, polkit, ntfs-3g, lsof, rsync, smartmontools, python, python-gobject, gtk4, libadwaita>=1.5, libnotify (13) | **bash, coreutils, gawk, glibc, ntfs-3g, sed, systemd, util-linux** (8) |
 | `optdepends` | ddrescue, testdisk | big-storage-rescue |
-| installed files | 45, 803 KB | 7, 41 KB (with the version file) |
+| installed files | 45, 803 KB | 37, 291 KB (with the version file and 31 translations) |
 
 What Big-Mount calls, and the package of each program:
 

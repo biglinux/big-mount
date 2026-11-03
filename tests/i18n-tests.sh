@@ -42,13 +42,17 @@ for po in locale/*.po; do
     check "$lang: no obsolete message left behind (#~)" bash -c '! grep -q "^#~" "$1"' _ "$po"
     check "$lang: every msgid of the template exists in the translation" \
         test -z "$(comm -23 <(msgids locale/big-mount.pot) <(msgids "$po"))"
-    # The same printf directives, in the same order, in msgid and msgstr
+    # The same printf directives, in the same order, in msgid and msgstr. A
+    # literal %% takes no argument, so it may move (Turkish writes %80)
     bad="$(python3 -I - "$po" <<'EOF'
 import re, sys
 text = open(sys.argv[1], encoding="utf-8").read()
 spec = re.compile(r"%[-+ #0]*[0-9]*(?:\.[0-9]+)?[sdiuxXfc%]")
+def args(s):
+    found = spec.findall(s)
+    return [d for d in found if d != "%%"], found.count("%%")
 for mid, mstr in re.findall(r'^msgid "(.*)"\nmsgstr "(.*)"$', text, re.M):
-    if mid and mstr and spec.findall(mid) != spec.findall(mstr):
+    if mid and mstr and args(mid) != args(mstr):
         print(mid)
 EOF
 )"
@@ -56,10 +60,16 @@ EOF
     [ -n "$bad" ] && printf '      %s\n' "$bad"
 done
 
-begin "generated catalog matches the translation (run locale/compile.sh)"
+while read -r lang; do
+    check "$lang: in locale/LINGUAS and has a translation (locale/$lang.po)" test -f "locale/$lang.po"
+done < locale/LINGUAS
+
+begin "generated catalogs match the translations (run locale/compile.sh)"
 DEST="$WORK/gen" bash locale/compile.sh
-check "pt_BR .mo" cmp -s <(msgunfmt "$WORK/gen/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo") \
-    <(msgunfmt big-mount/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo)
+while read -r lang; do
+    check "$lang .mo" cmp -s <(msgunfmt "$WORK/gen/usr/share/locale/$lang/LC_MESSAGES/big-mount.mo") \
+        <(msgunfmt "big-mount/usr/share/locale/$lang/LC_MESSAGES/big-mount.mo")
+done < locale/LINGUAS
 
 begin "no user-visible text outside the translation system"
 # Exit 1 only: a match (0) fails, and so does an error of grep (2), which prints nothing
@@ -72,9 +82,9 @@ help_line() { env -i PATH="$PATH" "$@" bash "$BM" --help 2>/dev/null | head -n1;
 check "LANG=C: English" test "$(help_line LANG=C)" = "Usage: bigmount [OPTION]"
 check "LANG=en_US.UTF-8: English" test "$(help_line LANG=en_US.UTF-8)" = "Usage: bigmount [OPTION]"
 check "LANG=pt_BR.UTF-8: Portuguese" test "$(help_line LANG=pt_BR.UTF-8)" = "Uso: bigmount [OPÇÃO]"
-check "language without translation (de_DE): English" test "$(help_line LANG=de_DE.UTF-8)" = "Usage: bigmount [OPTION]"
-check "LANGUAGE=fr:pt_BR falls back to the next language" \
-    test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=fr:pt_BR)" = "Uso: bigmount [OPÇÃO]"
+check "language without translation (Esperanto): English" test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=eo)" = "Usage: bigmount [OPTION]"
+check "LANGUAGE=eo:pt_BR falls back to the next language" \
+    test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=eo:pt_BR)" = "Uso: bigmount [OPÇÃO]"
 check "errors are translated too" \
     bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --bogus 2>&1 | grep -q "opção desconhecida"' _ "$BM"
 # bash translates $"..." while parsing a command: a text domain chosen inside
@@ -88,6 +98,18 @@ check "--version: translated labels aligned by characters, not bytes" env LC_ALL
     cols="$(env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --version | tail -n +2 | while IFS= read -r l; do
         [[ $l =~ ^([^:]*:\ +) ]] && echo "${#BASH_REMATCH[1]}"; done | sort -u | wc -l)"
     [ "$cols" -eq 1 ]' _ "$BM"
+# CJK characters take two columns: aligned by what the terminal shows.
+# col_of REGEX: the columns taken by group 1 of REGEX, for each line that matches
+col_of() {
+    LC_ALL=C.UTF-8 bash -c '. "$2"; while IFS= read -r l; do [[ $l =~ $1 ]] && { bm_width "${BASH_REMATCH[1]}"; echo "$REPLY"; }; done' \
+        _ "$1" "$REPO/big-mount/usr/lib/big-mount/cli.sh"
+}
+aligned() { [ "$(wc -l <<< "$2")" -eq "$1" ] && [ "$(sort -u <<< "$2" | wc -l)" -eq 1 ]; }
+ja() { env -i PATH="$PATH" LC_ALL=pt_BR.UTF-8 LANGUAGE=ja bash "$BM" "$@"; }
+check "--version: Japanese labels aligned by terminal columns" \
+    aligned 2 "$(ja --version | tail -n +2 | col_of '^(  [^ ]+ +)')"
+check "--help: Japanese options aligned by terminal columns" \
+    aligned 5 "$(ja --help | sed -n 3,7p | col_of '^(  .*[^ ]  +)')"
 check "--doctor translated" bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 HOME="$HOME" bash "$1" --doctor 2>/dev/null | grep -q "^Resultado: "' _ "$BM"
 check "a command that moved is explained in the language of the user" \
     bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --drive 2>&1 | grep -q "foi para o Big Storage Rescue"' _ "$BM"

@@ -104,168 +104,168 @@ msgstr ""
 msgid "mount internal partitions (run at boot by big-mount.service)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:32
+#: big-mount/usr/lib/big-mount/cli.sh:33
 msgid "show what would be mounted, change nothing"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:33
+#: big-mount/usr/lib/big-mount/cli.sh:34
 msgid "check the boot service and what it did in this boot"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:34
+#: big-mount/usr/lib/big-mount/cli.sh:35
 msgid "show the version and the source revision"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:35
+#: big-mount/usr/lib/big-mount/cli.sh:36
 msgid "show this help"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:36
+#: big-mount/usr/lib/big-mount/cli.sh:37
 msgid "Configuration: /etc/big-mount.conf. To mount again now: sudo systemctl restart big-mount"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:37
+#: big-mount/usr/lib/big-mount/cli.sh:38
 msgid "Diagnosis of devices, safe removal and file rescue: big-storage-rescue (package big-storage-rescue)."
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:55 big-mount/usr/lib/big-mount/cli.sh:255
+#: big-mount/usr/lib/big-mount/cli.sh:56 big-mount/usr/lib/big-mount/cli.sh:268
 msgid "bigmount: unknown option '%s' (see bigmount --help)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:71
+#: big-mount/usr/lib/big-mount/cli.sh:72
 msgid "bigmount: Secure Erase is no longer part of Big-Mount."
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:77
+#: big-mount/usr/lib/big-mount/cli.sh:78
 msgid "bigmount: %s moved to Big Storage Rescue. Use: %s"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:79
+#: big-mount/usr/lib/big-mount/cli.sh:80
 msgid "Install it with: sudo pacman -S big-storage-rescue"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:114
+#: big-mount/usr/lib/big-mount/cli.sh:127
 msgid "source checkout (not installed by a package)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:123
+#: big-mount/usr/lib/big-mount/cli.sh:136
 msgid "package:"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:123
+#: big-mount/usr/lib/big-mount/cli.sh:136
 msgid "revision:"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:123
+#: big-mount/usr/lib/big-mount/cli.sh:136
 msgid "source:"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:131
+#: big-mount/usr/lib/big-mount/cli.sh:144
 msgid "unknown"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:174
+#: big-mount/usr/lib/big-mount/cli.sh:187
 msgid "Missing file of the package: %s"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:175
-#: big-mount/usr/lib/big-mount/cli.sh:184
-#: big-mount/usr/lib/big-mount/cli.sh:206
+#: big-mount/usr/lib/big-mount/cli.sh:188
+#: big-mount/usr/lib/big-mount/cli.sh:197
+#: big-mount/usr/lib/big-mount/cli.sh:219
 msgid "Reinstall the big-mount package."
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:183
+#: big-mount/usr/lib/big-mount/cli.sh:196
 msgid "Unsafe owner or permissions: %s (%s)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:191
+#: big-mount/usr/lib/big-mount/cli.sh:204
 msgid "Boot service (big-mount.service)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:193
+#: big-mount/usr/lib/big-mount/cli.sh:206
 msgid "/etc/bigmountall-no exists: mounting at boot is disabled on purpose"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:205
+#: big-mount/usr/lib/big-mount/cli.sh:218
 msgid "Enabled at boot"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:206
+#: big-mount/usr/lib/big-mount/cli.sh:219
 msgid "Not found by systemd"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:207
+#: big-mount/usr/lib/big-mount/cli.sh:220
 msgid "Not enabled at boot (%s)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:207
+#: big-mount/usr/lib/big-mount/cli.sh:220
 msgid "Enable it: sudo systemctl enable big-mount"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:210
+#: big-mount/usr/lib/big-mount/cli.sh:223
 msgid "Ran in this boot"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:212
+#: big-mount/usr/lib/big-mount/cli.sh:225
 msgid "State in this boot: %s (%s)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:213
+#: big-mount/usr/lib/big-mount/cli.sh:226
 msgid "See: journalctl -b -u big-mount"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:216
+#: big-mount/usr/lib/big-mount/cli.sh:229
 msgid "The unit is replaced by %s"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:217
+#: big-mount/usr/lib/big-mount/cli.sh:230
 msgid "A copy in /etc/systemd/system overrides the package: remove it unless it is intended."
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:219
+#: big-mount/usr/lib/big-mount/cli.sh:232
 msgid "Drop-in files change the unit: %s"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:229
+#: big-mount/usr/lib/big-mount/cli.sh:242
 msgid "Partitions handled by Big-Mount at boot: %d"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:230
+#: big-mount/usr/lib/big-mount/cli.sh:243
 msgid "Failed at boot"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:231
+#: big-mount/usr/lib/big-mount/cli.sh:244
 msgid "Mounted read-only at boot"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:237
+#: big-mount/usr/lib/big-mount/cli.sh:250
 msgid "Configuration: PERMISSIONS=%s"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:238
+#: big-mount/usr/lib/big-mount/cli.sh:251
 msgid "Configuration: unknown PERMISSIONS value, shared is used"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:246
+#: big-mount/usr/lib/big-mount/cli.sh:259
 msgid "Warnings in the journal of this boot"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:249
+#: big-mount/usr/lib/big-mount/cli.sh:262
 msgid "The journal is not readable by this user: boot messages not checked"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:260
+#: big-mount/usr/lib/big-mount/cli.sh:273
 msgid "Big-Mount check (nothing is changed; labels and mount points are left out)"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:264
+#: big-mount/usr/lib/big-mount/cli.sh:277
 msgid "Result: %d problem(s), %d warning(s)."
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:266
+#: big-mount/usr/lib/big-mount/cli.sh:279
 msgid "Why a partition is read-only or failed to mount, and the health of its drive: big-storage-rescue --diagnose DEVICE"
 msgstr ""
 
-#: big-mount/usr/lib/big-mount/cli.sh:268
+#: big-mount/usr/lib/big-mount/cli.sh:281
 msgid "To find out why a partition is read-only or failed to mount, install big-storage-rescue."
 msgstr ""

@@ -3,14 +3,14 @@
 | | Big-Mount 2.6 | Big-Mount 3.0 |
 | --- | --- | --- |
 | Responsibility | automount + drive manager, diagnosis, removal, rescue, Secure Erase, notifier, GTK application | automount |
-| Installed files | 45 | 7 |
-| Installed size | 803 KB | 41 KB |
+| Installed files | 45 | 37: 6, the version file and 31 translations |
+| Installed size | 803 KB | 291 KB, 258 KB of it translations (41 KB with pt_BR only) |
 | Dependencies | 13 | 8, five of them from the base system (3 before they were all listed) |
 | Boot path (`/usr/bin/bigmount` without options) | — | identical code (only comments changed) |
 | Code loaded at boot | `bigmount` | `bigmount` (unchanged) |
 | Processes left after boot | FUSE daemons of NTFS volumes | the same |
 | `bigmount --help` | 7 ms | 3 ms |
-| Translations (pt_BR) | 1231 messages | 66 |
+| Translations | pt_BR, 1231 messages; 31 languages after 2.6 | 31 languages, 66 messages each |
 | Tests in CI | 7 suites, GTK on Broadway | 3 suites, bash and gettext only |
 
 Times are the best of six runs on the development machine.

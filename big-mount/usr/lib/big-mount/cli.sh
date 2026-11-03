@@ -26,9 +26,10 @@ BM_STATUS_FILE=/run/big-mount/status
 
 bm_usage() {
    printf $"Usage: bigmount [OPTION]"'\n\n'
+   # printf pads by bytes: the translated "(none)" is padded by columns
    # shellcheck disable=SC2247  # $"(none)" is a translatable string
+   bm_pad $"(none)" 16; printf '  %s %s\n' "$REPLY" $"mount internal partitions (run at boot by big-mount.service)"
    printf '  %-16s %s\n' \
-      $"(none)" $"mount internal partitions (run at boot by big-mount.service)" \
       "--dry-run" $"show what would be mounted, change nothing" \
       "--doctor" $"check the boot service and what it did in this boot" \
       "-V, --version" $"show the version and the source revision" \
@@ -81,10 +82,22 @@ bm_moved() {
    return 2
 }
 
-# Pad TEXT to WIDTH characters (not bytes: translations have accents)
+# Everything but the East Asian wide characters (CJK, its rarer ideographs in
+# planes 2 and 3, kana, Hangul, full-width forms), which take two columns
+BM_NARROW=$'[!ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦\U00020000-\U0003fffd]'
+
+# bm_width TEXT: the terminal columns TEXT takes, in REPLY
+bm_width() {
+   local wide="${1//$BM_NARROW/}"
+   REPLY=$((${#1} + ${#wide}))
+}
+
+# Pad TEXT to WIDTH terminal columns (not bytes: translations have accents,
+# and CJK characters take two columns)
 bm_pad() {
    local s="${1//[[:cntrl:]]/?}" w="$2"
-   printf -v REPLY '%s%*s' "$s" $((w - ${#s})) ""
+   bm_width "$s"
+   printf -v REPLY '%s%*s' "$s" $((REPLY < w ? w - REPLY : 0)) ""
 }
 
 # ---------------------------------------------------------------------------
@@ -120,12 +133,12 @@ bm_version_info() {
 }
 
 bm_cmd_version() {
-   local l_pkg=$"package:" l_rev=$"revision:" l_src=$"source:" w
+   local l_pkg=$"package:" l_rev=$"revision:" l_src=$"source:" l w=0
    bm_version_info
-   # Labels are aligned by characters (translations have accents)
-   w="${#l_pkg}"
-   [ "${#l_rev}" -gt "$w" ] && w="${#l_rev}"
-   [ "${#l_src}" -gt "$w" ] && w="${#l_src}"
+   # Labels are aligned by terminal columns (accents, CJK)
+   for l in "$l_pkg" "$l_rev" "$l_src"; do
+      bm_width "$l"; [ "$REPLY" -gt "$w" ] && w="$REPLY"
+   done
    printf 'Big-Mount %s\n' "$BM_VERSION"
    [ -n "$V_PKG" ] && { bm_pad "$l_pkg" "$w"; printf '  %s %s\n' "$REPLY" "$V_PKG"; }
    [ -n "$V_REVISION" ] || V_REVISION=$"unknown"
