@@ -8,12 +8,20 @@ pkgver=$(date +%y.%m.%d)
 pkgrel=$(date +%H%M)
 arch=('any')
 license=('GPL-3.0-or-later')
-# Only what the boot run uses: bash, util-linux (blkid, lsblk, findmnt, mount,
-# flock) and ntfs-3g (lowntfs-3g for NTFS). udevadm, getent and awk come with
-# the base system (systemd, glibc, gawk). No graphical toolkit, no Python:
-# diagnosis, safe removal and file rescue are the separate package
-# big-storage-rescue, which reads what this one leaves in /run/big-mount.
-depends=('bash' 'util-linux' 'ntfs-3g')
+# Every package whose programs bigmount calls, as Arch asks, even those of the
+# base system:
+#   util-linux  blkid, lsblk, findmnt, mount, flock
+#   ntfs-3g     mount.lowntfs-3g (NTFS)
+#   systemd     udevadm, systemctl, journalctl (--doctor) and the service itself
+#   coreutils   readlink, dirname, mkdir, ln, rm, rmdir, stat, head, tail
+#   glibc       getent
+#   gawk        awk
+#   sed         sed (--doctor)
+# FAT32, exFAT, ext4, Btrfs, XFS and F2FS are mounted by the kernel drivers.
+# No graphical toolkit, no Python: diagnosis, safe removal and file rescue are
+# the separate package big-storage-rescue, which reads what this one leaves in
+# /run/big-mount.
+depends=('bash' 'coreutils' 'gawk' 'glibc' 'ntfs-3g' 'sed' 'systemd' 'util-linux')
 optdepends=('big-storage-rescue: explains read-only or failed mounts, safe removal, drive health and file rescue')
 provides=('big-mount-git')
 conflicts=('big-mount-git')

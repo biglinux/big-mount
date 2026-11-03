@@ -5,7 +5,7 @@
 | Responsibility | automount + drive manager, diagnosis, removal, rescue, Secure Erase, notifier, GTK application | automount |
 | Installed files | 45 | 7 |
 | Installed size | 803 KB | 41 KB |
-| Dependencies | 13 | 3 |
+| Dependencies | 13 | 8, five of them from the base system (3 before they were all listed) |
 | Boot path (`/usr/bin/bigmount` without options) | — | identical code (only comments changed) |
 | Code loaded at boot | `bigmount` | `bigmount` (unchanged) |
 | Processes left after boot | FUSE daemons of NTFS volumes | the same |
