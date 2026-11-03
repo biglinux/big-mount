@@ -60,38 +60,31 @@ EOF
     [ -n "$bad" ] && printf '      %s\n' "$bad"
 done
 
-begin "generated resources match their templates (run locale/compile.sh)"
+while read -r lang; do
+    check "$lang: in locale/LINGUAS and has a translation (locale/$lang.po)" test -f "locale/$lang.po"
+done < locale/LINGUAS
+
+begin "generated catalogs match the translations (run locale/compile.sh)"
 DEST="$WORK/gen" bash locale/compile.sh
-for f in usr/share/applications/big-mount.desktop usr/share/big-mount/big-mount-notifier.desktop \
-         usr/share/kio/servicemenus/big-mount.desktop usr/share/polkit-1/actions/org.biglinux.big-mount.policy; do
-    check "$f" cmp -s "$WORK/gen/$f" "big-mount/$f"
-done
-check "pt_BR .mo" cmp -s <(msgunfmt "$WORK/gen/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo") \
-    <(msgunfmt big-mount/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo)
-for key in Name Comment GenericName Keywords; do
-    check "launcher: $key translated" grep -q "^$key\[pt_BR\]=" big-mount/usr/share/applications/big-mount.desktop
-done
-check "service menu: submenu and actions translated" \
-    test "$(grep -c '\[pt_BR\]=' big-mount/usr/share/kio/servicemenus/big-mount.desktop)" -eq 4
-check "polkit: description and message translated (pt_BR form)" \
-    test "$(grep -c 'xml:lang="pt_BR"' big-mount/usr/share/polkit-1/actions/org.biglinux.big-mount.policy)" -eq 4
-check "polkit: every language as a POSIX locale name (zh_CN, not zh-Hans-CN)" \
-    bash -c '! grep -q "xml:lang=\"[^\"]*-" "$1"' _ big-mount/usr/share/polkit-1/actions/org.biglinux.big-mount.policy
+while read -r lang; do
+    check "$lang .mo" cmp -s <(msgunfmt "$WORK/gen/usr/share/locale/$lang/LC_MESSAGES/big-mount.mo") \
+        <(msgunfmt "big-mount/usr/share/locale/$lang/LC_MESSAGES/big-mount.mo")
+done < locale/LINGUAS
 
 begin "no user-visible text outside the translation system"
 # Exit 1 only: a match (0) fails, and so does an error of grep (2), which prints nothing
 check "code and templates are English (no accented letters outside .po/.mo)" \
-    bash -c 'LC_ALL=C.UTF-8 grep -rqP --exclude-dir=__pycache__ "[\x{00C0}-\x{024F}]" "$@"; [ "$?" -eq 1 ]' _ big-mount/usr/bin big-mount/usr/lib locale/templates locale/*.sh
+    bash -c 'LC_ALL=C.UTF-8 grep -rqP "[\x{00C0}-\x{024F}]" "$@"; [ "$?" -eq 1 ]' _ big-mount/usr/bin big-mount/usr/lib locale/*.sh
 
 begin "language chosen at run time"
 BM=big-mount/usr/bin/bigmount
 help_line() { env -i PATH="$PATH" "$@" bash "$BM" --help 2>/dev/null | head -n1; }
-check "LANG=C: English" test "$(help_line LANG=C)" = "Usage: bigmount [OPTION] [DEVICE|FOLDER]"
-check "LANG=en_US.UTF-8: English" test "$(help_line LANG=en_US.UTF-8)" = "Usage: bigmount [OPTION] [DEVICE|FOLDER]"
-check "LANG=pt_BR.UTF-8: Portuguese" test "$(help_line LANG=pt_BR.UTF-8)" = "Uso: bigmount [OPÇÃO] [DISPOSITIVO|PASTA]"
-check "language without translation (Esperanto): English" test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=eo)" = "Usage: bigmount [OPTION] [DEVICE|FOLDER]"
+check "LANG=C: English" test "$(help_line LANG=C)" = "Usage: bigmount [OPTION]"
+check "LANG=en_US.UTF-8: English" test "$(help_line LANG=en_US.UTF-8)" = "Usage: bigmount [OPTION]"
+check "LANG=pt_BR.UTF-8: Portuguese" test "$(help_line LANG=pt_BR.UTF-8)" = "Uso: bigmount [OPÇÃO]"
+check "language without translation (Esperanto): English" test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=eo)" = "Usage: bigmount [OPTION]"
 check "LANGUAGE=eo:pt_BR falls back to the next language" \
-    test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=eo:pt_BR)" = "Uso: bigmount [OPÇÃO] [DISPOSITIVO|PASTA]"
+    test "$(help_line LANG=pt_BR.UTF-8 LANGUAGE=eo:pt_BR)" = "Uso: bigmount [OPÇÃO]"
 check "errors are translated too" \
     bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --bogus 2>&1 | grep -q "opção desconhecida"' _ "$BM"
 # bash translates $"..." while parsing a command: a text domain chosen inside
@@ -105,8 +98,21 @@ check "--version: translated labels aligned by characters, not bytes" env LC_ALL
     cols="$(env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --version | tail -n +2 | while IFS= read -r l; do
         [[ $l =~ ^([^:]*:\ +) ]] && echo "${#BASH_REMATCH[1]}"; done | sort -u | wc -l)"
     [ "$cols" -eq 1 ]' _ "$BM"
-check "--version: Japanese labels kept whole" bash -c 'env -i PATH="$PATH" LC_ALL=pt_BR.UTF-8 LANGUAGE=ja bash "$1" --version | grep -q "リビジョン:"' _ "$BM"
+# CJK characters take two columns: aligned by what the terminal shows.
+# col_of REGEX: the columns taken by group 1 of REGEX, for each line that matches
+col_of() {
+    LC_ALL=C.UTF-8 bash -c '. "$2"; while IFS= read -r l; do [[ $l =~ $1 ]] && { bm_width "${BASH_REMATCH[1]}"; echo "$REPLY"; }; done' \
+        _ "$1" "$REPO/big-mount/usr/lib/big-mount/cli.sh"
+}
+aligned() { [ "$(wc -l <<< "$2")" -eq "$1" ] && [ "$(sort -u <<< "$2" | wc -l)" -eq 1 ]; }
+ja() { env -i PATH="$PATH" LC_ALL=pt_BR.UTF-8 LANGUAGE=ja bash "$BM" "$@"; }
+check "--version: Japanese labels aligned by terminal columns" \
+    aligned 2 "$(ja --version | tail -n +2 | col_of '^(  [^ ]+ +)')"
+check "--help: Japanese options aligned by terminal columns" \
+    aligned 5 "$(ja --help | sed -n 3,7p | col_of '^(  .*[^ ]  +)')"
 check "--doctor translated" bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 HOME="$HOME" bash "$1" --doctor 2>/dev/null | grep -q "^Resultado: "' _ "$BM"
+check "a command that moved is explained in the language of the user" \
+    bash -c 'env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$1" --drive 2>&1 | grep -q "foi para o Big Storage Rescue"' _ "$BM"
 
 # A translation that lacks one message: that one stays English, the rest is translated
 mkdir -p "$WORK/tree/usr/bin" "$WORK/tree/usr/share/locale/pt_BR/LC_MESSAGES"
@@ -114,7 +120,7 @@ cp "$BM" "$WORK/tree/usr/bin/"; cp -r big-mount/usr/lib "$WORK/tree/usr/"
 msgattrib --no-wrap locale/pt_BR.po | python3 -I -c '
 import sys
 t = sys.stdin.read()
-print(t.replace("msgstr \"Uso: bigmount [OPÇÃO] [DISPOSITIVO|PASTA]\"", "msgstr \"\""))' > "$WORK/partial.po"
+print(t.replace("msgstr \"Uso: bigmount [OPÇÃO]\"", "msgstr \"\""))' > "$WORK/partial.po"
 msgfmt -o "$WORK/tree/usr/share/locale/pt_BR/LC_MESSAGES/big-mount.mo" "$WORK/partial.po"
 out="$(env -i PATH="$PATH" LANG=pt_BR.UTF-8 bash "$WORK/tree/usr/bin/bigmount" --help)"
 check "incomplete translation: the missing message falls back to English" grep -q "^Usage: bigmount" <<< "$out"
@@ -137,25 +143,6 @@ else
     printf '  \033[33m-\033[0m terminal (skipped: script(1) unavailable)\n'
 fi
 check "journal (no terminal): English" bash -c '! grep -qE "ignorado|montado|deixado" <<< "$1" && grep -qE "skipped|mounted|left to UDisks" <<< "$1"' _ "$out_log"
-
-begin "formatting with Unicode and long values"
-# shellcheck source=../big-mount/usr/lib/big-mount/cli.sh
-BIGMOUNT_LIB="$REPO/big-mount/usr/lib/big-mount" . "$REPO/big-mount/usr/lib/big-mount/cli.sh"
-BM_UI="tty"; bm_ui_init
-long="Fotos da Família — viagem ao Japão 東京 2026 ✓ $(printf 'x%.0s' {1..120})"
-bm_doc_new; bm_doc_kv "Device" "$long"; bm_doc_render_text
-check "long Unicode label is kept whole in the terminal" grep -qF "$long" <<< "$REPLY"
-check "long Unicode label is kept whole in dialogs" grep -qF "Fotos da Família — viagem ao Japão 東京" <<< "$(bm_doc_nul | tr '\0' '\n')"
-LANGUAGE=pt_BR LC_ALL=pt_BR.UTF-8 printf -v t $"%s is still in use" "$long"
-check "translated format with a Unicode argument" bash -c '[[ $1 == *"Japão"*"em uso" || $1 == *"Japão"*"in use" ]]' _ "$t"
-
-begin "plural forms and answers in the language of the messages"
-L="$REPO/big-mount/usr/lib/big-mount"
-plural() { LC_ALL=pt_BR.UTF-8 LANGUAGE=pt_BR BIGMOUNT_LIB="$L" bash -c '. "$BIGMOUNT_LIB/cli.sh"; bm_nfmt "%s file differs" "%s files differ" "$1" "$1"; printf "%s" "$REPLY"' _ "$1"; }
-check "Portuguese, one: the singular" test "$(plural 1)" = "1 arquivo difere"
-check "Portuguese, three: the plural" test "$(plural 3)" = "3 arquivos diferem"
-check "a Portuguese s answers yes" env LC_ALL=pt_BR.UTF-8 LANGUAGE=pt_BR BIGMOUNT_LIB="$L" bash -c '. "$BIGMOUNT_LIB/cli.sh"; bm_ui_is_yes sim'
-check "  ... a German j too" env LC_ALL=pt_BR.UTF-8 LANGUAGE=de BIGMOUNT_LIB="$L" bash -c '. "$BIGMOUNT_LIB/cli.sh"; bm_ui_is_yes ja'
 
 echo ""
 echo "========================================="

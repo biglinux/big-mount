@@ -7,8 +7,9 @@
 # and USB/FireWire/SD/Thunderbolt devices are left to UDisks2 (Plasma,
 # Dolphin), and partitions listed in /etc/fstab are never touched.
 #
-# Diagnostics and safe removal (bigmount --help) live in /usr/lib/big-mount
-# and are only loaded when asked for, so the boot path stays small.
+# The other options (bigmount --help) live in /usr/lib/big-mount/cli.sh and
+# are only loaded when asked for, so the boot path stays small. Diagnosis,
+# safe removal and file rescue are Big Storage Rescue, a separate package.
 
 DRY_RUN=""
 case "${1:-}" in
@@ -539,7 +540,8 @@ for i in "${CANDIDATES[@]}"; do
    fi
 done
 
-# State for the user session notifier (bigmount --notifier) and --diagnose.
+# State for bigmount --doctor and for whoever explains devices to the user
+# (big-storage-rescue --diagnose): format v1 below, read as data.
 # A partition an earlier run mounted is skipped in this one: its line is kept
 # while it is still mounted there, so the reason it is read-only is kept too.
 if [ -z "$DRY_RUN" ]; then

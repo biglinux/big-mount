@@ -8,16 +8,21 @@ pkgver=$(date +%y.%m.%d)
 pkgrel=$(date +%H%M)
 arch=('any')
 license=('GPL-3.0-or-later')
-# The boot path needs only bash, util-linux, udisks2 and ntfs-3g. The rest is the
-# desktop side: python, python-gobject, gtk4 and libadwaita (>= 1.5) draw the
-# application of --gui-drive and every dialog (--gui, --gui-remove, the notifier),
-# and are loaded only by them; libnotify sends the notifications; pkexec (polkit)
-# starts the helper; rsync does every copy and smartctl reads the health of a drive.
-# Commands of the base system (coreutils, findutils, gawk, gettext, systemd) are not listed.
-depends=('bash' 'util-linux' 'udisks2' 'polkit' 'ntfs-3g' 'lsof' 'rsync' 'smartmontools'
-         'python' 'python-gobject' 'gtk4' 'libadwaita>=1.5' 'libnotify')
-optdepends=('ddrescue: disk images of a failing drive, before a deep analysis'
-            'testdisk: find lost partitions, search files by content (PhotoRec)')
+# Every package whose programs bigmount calls, as Arch asks, even those of the
+# base system:
+#   util-linux  blkid, lsblk, findmnt, mount, flock
+#   ntfs-3g     mount.lowntfs-3g (NTFS)
+#   systemd     udevadm, systemctl, journalctl (--doctor) and the service itself
+#   coreutils   readlink, dirname, mkdir, ln, rm, rmdir, stat, head, tail
+#   glibc       getent
+#   gawk        awk
+#   sed         sed (--doctor)
+# FAT32, exFAT, ext4, Btrfs, XFS and F2FS are mounted by the kernel drivers.
+# No graphical toolkit, no Python: diagnosis, safe removal and file rescue are
+# the separate package big-storage-rescue, which reads what this one leaves in
+# /run/big-mount.
+depends=('bash' 'coreutils' 'gawk' 'glibc' 'ntfs-3g' 'sed' 'systemd' 'util-linux')
+optdepends=('big-storage-rescue: explains read-only or failed mounts, safe removal, drive health and file rescue')
 provides=('big-mount-git')
 conflicts=('big-mount-git')
 replaces=('big-mount-git')
@@ -25,7 +30,7 @@ backup=('etc/big-mount.conf')
 install=big-mount.install
 # The official repository; work done in forks comes in by pull request
 url="https://github.com/biglinux/big-mount"
-pkgdesc="Mounts internal partitions at boot; diagnoses drives, rescues files from them and removes them safely"
+pkgdesc="Mounts the partitions of internal disks at boot"
 source=("git+https://github.com/biglinux/big-mount.git")
 makedepends=("git")
 md5sums=(SKIP)

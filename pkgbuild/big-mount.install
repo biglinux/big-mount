@@ -1,10 +1,25 @@
 # Big-Mount install messages. Nothing is restarted automatically: the boot
-# service is enabled by big-mount.hook. Nothing runs in the session by default.
+# service is enabled by big-mount.hook. Nothing runs in the session.
 
 post_install() {
     echo ":: Big-Mount mounts the internal partitions at the next boot."
     echo "   To mount them now: sudo systemctl start big-mount"
-    echo "   Diagnosis: bigmount --diagnose   |   Dolphin: right-click > Storage device"
+    echo "   To check it: bigmount --doctor"
+}
+
+# Run before the files are replaced: what is installed is still the old version
+pre_upgrade() {
+    # 2.x had the drive manager, the diagnosis and safe removal
+    [ -e /usr/lib/big-mount/drive.sh ] || return 0
+    echo ":: The drive manager, the diagnosis and safe removal of Big-Mount are now"
+    echo "   Big Storage Rescue: sudo pacman -S big-storage-rescue"
+    echo "   Its copies and settings are brought over the first time it opens."
+    # A copy or a disk image of the 2.x drive manager keeps running, but the
+    # files that manage it go away with this update
+    if pgrep -f 'bigmount --drive __run' >/dev/null 2>&1; then
+        echo ":: A copy or disk image started in Big-Mount is still running. It goes on;"
+        echo "   Big Storage Rescue brings it over when it ends."
+    fi
 }
 
 post_upgrade() {
